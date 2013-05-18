@@ -7,6 +7,8 @@ tags:
 ---
 
 最近需要在项目中添加[Android 4.1 Notification BigPicture](http://capdroid.wordpress.com/2012/07/16/android-4-1-jelly-beans-notification-tutorial-part-ii/) 支持，来让这个提醒条更加美观。下面便是代码：
+`Redcarpet Code `
+
 ```java
 Intent notificationIntent  = fillDatabaseContentToIntent(context, cursor1, cursor2, false);
 Intent shareIntent = fillDatabaseContentToIntent(context, cursor1, cursor2, true);
@@ -45,9 +47,13 @@ private Intent fillDatabaseContentToIntent(Context context, Cursor cursor1, Curs
     return notificationIntent;
 }       
 ```
+
 很简单的逻辑， notification中有两个按钮，一个是查看，一个是分享。然后分享的话，我们在extra中将其To_SHARE设置为真，而如果是查看的话，其值为假。
 
 接下来我们在DetailActivity中，获取TO_SHARE的值来决定是否应该调出分享操作。
+
+`Pygment norml Code `
+
 {% highlight java %}
 Bundle extras = this.getIntent().getExtras();
 Boolean isToShareFromNotification =  extras.getBoolean(TO_SHARE);
