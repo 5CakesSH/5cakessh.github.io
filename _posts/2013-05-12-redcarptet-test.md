@@ -1,7 +1,6 @@
 ---
 layout: post
 title: "Redcarpet Test"
-date: 2013-04-02 13:18:35 +0800
 published: true
 tags: 
 - android #tags go here: space-separated string
