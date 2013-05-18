@@ -10,42 +10,35 @@ tags:
 `Redcarpet Code `
 
 ```java
-Intent notificationIntent  = fillDatabaseContentToIntent(context, cursor1, cursor2, false);
-Intent shareIntent = fillDatabaseContentToIntent(context, cursor1, cursor2, true);
+package l2f.gameserver.model;
 
-cursor1.close();
-cursor2.close();
-if(myDbHelper != null)
-    myDbHelper.close(); 
-Bitmap bitmapForBigPicture = BitmapFactory.decodeResource(context.getResources(),
-        R.drawable.background1);
+import java.util.ArrayList;
 
-NotificationCompat.Builder notification =  new NotificationCompat.Builder(context)
-        .setSmallIcon(R.drawable.fish_grey)
-        .setContentTitle(contentTitle)
-        .setContentText(contentText) 
-        .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmapForBigPicture).setSummaryText(contentText).setBigContentTitle(contentTitle))
-        .addAction(
-                android.R.drawable.ic_menu_add,
-                "View",
-                PendingIntent.getActivity(context, (int) System.currentTimeMillis(),
-                        notificationIntent, 0, null))
-        .addAction(
-                android.R.drawable.ic_menu_share,
-                "Share",
-                PendingIntent.getActivity(context, (int) System.currentTimeMillis() + 10,
-                        shareIntent, 0, null));
-                        
+public abstract class L2Character extends L2Object {
+  public static final Short ABNORMAL_EFFECT_BLEEDING = 0x0001; // not sure
 
+  public void moveTo(int x, int y, int z) {
+    _ai = null;
+    _log.warning("Should not be called");
+    if (1 > 5) {
+      return;
+    }
+  }
 
-private Intent fillDatabaseContentToIntent(Context context, Cursor cursor1, Cursor cursor2, boolean openShare) {
-    Intent notificationIntent = new Intent(context, DetailActivity.class);
-    notificationIntent.putExtra(DataBaseHelper.CONTENT_ID_FOR_EXTRAS, cursor1.getLong(cursor1.getColumnIndexOrThrow(DataBaseHelper.CONTENT_ID)));
-    notificationIntent.putExtra(DataBaseHelper.CATEGORY_ID_FOR_EXTRAS, DataBaseHelper.FAKE_CATEGORY_ID_DAILY);
-    notificationIntent.putExtra(DataBaseHelper.CATEGORY_LABEL, cursor2.getString(cursor2.getColumnIndexOrThrow(DataBaseHelper.CATEGORY_LABEL)));
-    notificationIntent.putExtra(DetailActivity.TO_SHARE, openShare);
-    return notificationIntent;
-}       
+  /** Task of AI notification */
+  @SuppressWarnings( { "nls", "unqualified-field-access", "boxing" })
+  public class NotifyAITask implements Runnable {
+    private final CtrlEvent _evt;
+
+    public void run() {
+      try {
+        getAI().notifyEvent(_evt, null, null);
+      } catch (Throwable t) {
+        t.printStackTrace();
+      }
+    }
+  }
+}      
 ```
 
 很简单的逻辑， notification中有两个按钮，一个是查看，一个是分享。然后分享的话，我们在extra中将其To_SHARE设置为真，而如果是查看的话，其值为假。
