@@ -1,0 +1,2723 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ 
+ <title>Tuo</title>
+ <link href="http://tuohuang.info/atom.xml" rel="self"/>
+ <link href="http://tuohuang.info/"/>
+ <updated>2013-05-18T14:00:12+08:00</updated>
+ <id>http://tuohuang.info/</id>
+ <author>
+   <name>Tuo</name>
+   <email>clarkhtse@gmail.com</email>
+ </author>
+
+ 
+ <entry>
+   <title>android notification 多个action时，PendingIntent中extra数据始终一样</title>
+   <link href="http://tuohuang.info/redcarptet-test"/>
+   <updated>2013-04-02T13:18:35+08:00</updated>
+   <id>http://tuohuang.info/redcarptet-test</id>
+   <content type="html">&lt;p&gt;最近需要在项目中添加&lt;a href=&quot;http://capdroid.wordpress.com/2012/07/16/android-4-1-jelly-beans-notification-tutorial-part-ii/&quot;&gt;Android 4.1 Notification BigPicture&lt;/a&gt; 支持，来让这个提醒条更加美观。下面便是代码：
+```java
+Intent notificationIntent  = fillDatabaseContentToIntent(context, cursor1, cursor2, false);
+Intent shareIntent = fillDatabaseContentToIntent(context, cursor1, cursor2, true);&lt;/p&gt;
+
+&lt;p&gt;cursor1.close();
+cursor2.close();
+if(myDbHelper != null)
+    myDbHelper.close(); 
+Bitmap bitmapForBigPicture = BitmapFactory.decodeResource(context.getResources(),
+        R.drawable.background1);&lt;/p&gt;
+
+&lt;p&gt;NotificationCompat.Builder notification =  new NotificationCompat.Builder(context)
+        .setSmallIcon(R.drawable.fish&lt;em&gt;grey)
+        .setContentTitle(contentTitle)
+        .setContentText(contentText) 
+        .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(bitmapForBigPicture).setSummaryText(contentText).setBigContentTitle(contentTitle))
+        .addAction(
+                android.R.drawable.ic&lt;/em&gt;menu&lt;em&gt;add,
+                &amp;quot;View&amp;quot;,
+                PendingIntent.getActivity(context, (int) System.currentTimeMillis(),
+                        notificationIntent, 0, null))
+        .addAction(
+                android.R.drawable.ic&lt;/em&gt;menu_share,
+                &amp;quot;Share&amp;quot;,
+                PendingIntent.getActivity(context, (int) System.currentTimeMillis() + 10,
+                        shareIntent, 0, null));&lt;/p&gt;
+
+&lt;p&gt;private Intent fillDatabaseContentToIntent(Context context, Cursor cursor1, Cursor cursor2, boolean openShare) {
+    Intent notificationIntent = new Intent(context, DetailActivity.class);
+    notificationIntent.putExtra(DataBaseHelper.CONTENT&lt;em&gt;ID&lt;/em&gt;FOR&lt;em&gt;EXTRAS, cursor1.getLong(cursor1.getColumnIndexOrThrow(DataBaseHelper.CONTENT&lt;/em&gt;ID)));
+    notificationIntent.putExtra(DataBaseHelper.CATEGORY&lt;em&gt;ID&lt;/em&gt;FOR&lt;em&gt;EXTRAS, DataBaseHelper.FAKE&lt;/em&gt;CATEGORY&lt;em&gt;ID&lt;/em&gt;DAILY);
+    notificationIntent.putExtra(DataBaseHelper.CATEGORY&lt;em&gt;LABEL, cursor2.getString(cursor2.getColumnIndexOrThrow(DataBaseHelper.CATEGORY&lt;/em&gt;LABEL)));
+    notificationIntent.putExtra(DetailActivity.TO&lt;em&gt;SHARE, openShare);
+    return notificationIntent;
+}&lt;br&gt;
+```
+很简单的逻辑， notification中有两个按钮，一个是查看，一个是分享。然后分享的话，我们在extra中将其To&lt;/em&gt;SHARE设置为真，而如果是查看的话，其值为假。&lt;/p&gt;
+
+&lt;p&gt;接下来我们在DetailActivity中，获取TO_SHARE的值来决定是否应该调出分享操作。
+Liquid error: undefined method `join' for #&lt;a href=&quot;String:0x007f9b933e0450&quot;&gt;String:0x007f9b933e0450&lt;/a&gt;
+但是我们发现这个 isToShareFromNotification 永远都是false,这个很是奇怪。
+整来整去都木有想明白，网上搜了搜，果然发现了一个方案:&lt;a href=&quot;http://stackoverflow.com/questions/3009059/android-pending-intent-notification-problem&quot;&gt;android pending intent notification problem&lt;/a&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The way I solved that problem was by assigning a unique requestID when you get the PendingIntent:
+PendingIntent.getActivity(context, requestID, showIntent, 0); 
+By doing so you are registering with the system different/unique intent instances.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;然后尝试了一下给一个不同的requestId.&lt;/p&gt;
+
+&lt;p&gt;Liquid error: undefined method `join' for #&lt;a href=&quot;String:0x007f9b933dfd98&quot;&gt;String:0x007f9b933dfd98&lt;/a&gt;&lt;br&gt;
+果然就正常工作了。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>android notification 多个action时，PendingIntent中extra数据始终一样</title>
+   <link href="http://tuohuang.info/android-notification-pendingintent-doesnt-work"/>
+   <updated>2013-04-02T13:18:35+08:00</updated>
+   <id>http://tuohuang.info/android-notification-pendingintent-doesnt-work</id>
+   <content type="html">&lt;p&gt;最近需要在项目中添加&lt;a href=&quot;http://capdroid.wordpress.com/2012/07/16/android-4-1-jelly-beans-notification-tutorial-part-ii/&quot;&gt;Android 4.1 Notification BigPicture&lt;/a&gt; 支持，来让这个提醒条更加美观。下面便是代码：
+Liquid error: undefined method `join' for #&lt;a href=&quot;String:0x007f9b934221c0&quot;&gt;String:0x007f9b934221c0&lt;/a&gt; 
+很简单的逻辑， notification中有两个按钮，一个是查看，一个是分享。然后分享的话，我们在extra中将其To_SHARE设置为真，而如果是查看的话，其值为假。&lt;/p&gt;
+
+&lt;p&gt;接下来我们在DetailActivity中，获取TO_SHARE的值来决定是否应该调出分享操作。
+Liquid error: undefined method `join' for #&lt;a href=&quot;String:0x007f9b93421a40&quot;&gt;String:0x007f9b93421a40&lt;/a&gt;
+但是我们发现这个 isToShareFromNotification 永远都是false,这个很是奇怪。
+整来整去都木有想明白，网上搜了搜，果然发现了一个方案:&lt;a href=&quot;http://stackoverflow.com/questions/3009059/android-pending-intent-notification-problem&quot;&gt;android pending intent notification problem&lt;/a&gt;.&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;The way I solved that problem was by assigning a unique requestID when you get the PendingIntent:
+PendingIntent.getActivity(context, requestID, showIntent, 0); 
+By doing so you are registering with the system different/unique intent instances.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;然后尝试了一下给一个不同的requestId.&lt;/p&gt;
+
+&lt;p&gt;Liquid error: undefined method `join' for #&lt;a href=&quot;String:0x007f9b93421310&quot;&gt;String:0x007f9b93421310&lt;/a&gt;&lt;br&gt;
+果然就正常工作了。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>How People Learn</title>
+   <link href="http://tuohuang.info/how-people-learn"/>
+   <updated>2013-03-29T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/how-people-learn</id>
+   <content type="html">&lt;p&gt;The Spring 2013 quarter at &lt;a href=&quot;http://starterleague.com&quot;&gt;The Starter League&lt;/a&gt; has begun, and we're excited to get started!&lt;/p&gt;
+
+&lt;p&gt;Part of that excitement is the chance to make every quarter successively better. Everyone on The Starter League team takes teaching and learning seriously. We're always looking to improve so that we can build the best learning experience for our students.&lt;/p&gt;
+
+&lt;p&gt;Recently I ran across a fascinating article about &lt;a href=&quot;http://www.farnamstreetblog.com/2013/01/how-people-learn&quot;&gt;how people learn&lt;/a&gt;. It's worth reading in full, but there were a few key insights that really stood out.&lt;/p&gt;
+
+&lt;h2&gt;Teach less.&lt;/h2&gt;
+
+&lt;p&gt;Your capacity to learn in a given session is limited to just a few ideas. When more is covered, less is retained. &lt;/p&gt;
+
+&lt;p&gt;We think about this a lot. We have eleven weeks to build your core skills, get you coding, and sustain your confidence. We focus on teaching within your capacity so you can retain what's important.&lt;/p&gt;
+
+&lt;p&gt;We know we can't cover everything in eleven weeks. Our goal is to give you the practical skills to code confidently, build, ship, and continue your journey.&lt;/p&gt;
+
+&lt;h2&gt;It's not about facts. It's about applying knowledge.&lt;/h2&gt;
+
+&lt;p&gt;Memorizing facts and techniques is necessary, but applying that knowledge to a real problem is crucial to learning and retention.&lt;/p&gt;
+
+&lt;p&gt;This is why we believe so much in &lt;a href=&quot;http://www.starterleague.com/starternight&quot;&gt;Starter Night&lt;/a&gt;. It's a chance to take what you've learned and build an app to solve a problem you care about. It's the culmination of many weeks of hard work, and it's an experience that will help you learn more deeply.&lt;/p&gt;
+
+&lt;p&gt;Having been a student last quarter, I can attest to the value of building something real. Our team was frustrated with friends who forgot to return our stuff. In four weeks we built an app from the ground up and &lt;a href=&quot;http://www.startnagging.com&quot;&gt;shipped it&lt;/a&gt;. It was a proud moment, and one that I can't wait for each of you to experience.&lt;/p&gt;
+
+&lt;h2&gt;Connect and be present.&lt;/h2&gt;
+
+&lt;p&gt;Everyone has different backgrounds, so it's important that we make a connection with you. &lt;/p&gt;
+
+&lt;p&gt;When we understand where you're coming from, we can help answer the questions that will help you learn -- why is this worth learning, and how is it applicable in the real world?&lt;/p&gt;
+
+&lt;p&gt;The best thing you can do is be present. &lt;/p&gt;
+
+&lt;p&gt;This doesn't mean you need to be the loudest voice in the room. Find what works for you. Pair up during class. Ask questions to your classmates or instructors. Participate during in-class exercises. Grab a beer and talk code. Come to office hours for one on one help. Do your homework. Code alone. Code often. Read ahead. Write about your experiences.&lt;/p&gt;
+
+&lt;p&gt;We're students too. We want to keep learning and getting better at what we do. And we can't wait to start learning with you.&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Android上setAlpha诡异问题</title>
+   <link href="http://tuohuang.info/stupid-setalpha-on-android"/>
+   <updated>2013-03-14T13:18:35+08:00</updated>
+   <id>http://tuohuang.info/stupid-setalpha-on-android</id>
+   <content type="html">&lt;p&gt;当有一次需要在imageView上使用setAlpha来改变当前view的透明度时，发现一个很2的问题.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;float opacity = (float) (1.0 - ((float)currentTime/1000.0 - spot.originalStartTime)/FADE_OUT_DURATION);
+imageView.setAlpha((int)(255.0*opacity));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;在调试中发现，本应该这个imageView的alpha从1(完全不透明)降到0(透明)，然后以后整个imageView应该就看不到了消失掉.&lt;/p&gt;
+
+&lt;p&gt;但是却发现imageView是从不透明到透明然后又从透明变回不透明。 这个甚是奇怪，因为这段代码在iOS上是木有问题的.&lt;/p&gt;
+
+&lt;p&gt;回头想了想，猜测可能是当opacity为负值时，android认为它跟正值一样，所以它显示为不透明了.&lt;/p&gt;
+
+&lt;p&gt;实验了一下，确实发现这个问题，opacity为负值时，它的最终表现是跟正值一样的. 吐血了 :(&lt;/p&gt;
+
+&lt;p&gt;所以又改了改代码&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;float opacity = (float) (1.0 - ((float)currentTime/1000.0 - spot.originalStartTime)/FADE_OUT_DURATION);
+if(opacity &amp;lt; 0)opacity = 0;
+hview.setAlpha((int)(255.0*opacity));   
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;终于正常了&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>iOS ViewController内存问题</title>
+   <link href="http://tuohuang.info/ios-view-controller-memory-issue"/>
+   <updated>2013-03-11T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/ios-view-controller-memory-issue</id>
+   <content type="html">&lt;p&gt;在做一个关于相片的app中，发现app使用起来是越来越慢，甚至就是有时崩溃了最后.我们用instruments打开之后观察内存的使用情况发现，从root vc -&amp;gt; detail A vc 之后内存占用变大了，这个没有任何问题，但是从detail A vc返回到root vc之后发现内存占用率却依然是没有降下来.所以如果你尝试几次root vc -&amp;gt; details A vc -&amp;gt; root vc --&amp;gt; detail B vc --&amp;gt; root vc， 这里当然是基于UINavigationController来管理每个controller之间的过渡，就会发现内容占用简直要爆表了. &lt;/p&gt;
+
+&lt;p&gt;这个很奇怪，我们当时想也许是从detail A返回之后， detail A的viewDidUnload方法没有被调用，所以它所引用的对象都没有被释放.这个就很奇怪了，我的理解是如果你一旦调用了popViewController:animated（如果你使用Seague，其实质也是调用此方法), 那么对应的detail A viewcontroller的viewDidUnload应该是会调用的，如果不是立刻被调用，也应该是很快。但是却发现一直没有被调用，但是dealloc()方法却是被调用了。于是为了验证我的理解是否准确，我创建了一个新项目，很简单的流程 UINavigationController -&amp;gt; RootVC -&amp;gt; DetailVC， 然后调试后发现，每次从DetailVC返回到RootVC，DetailVC的dealloc()几乎是“立刻“”被执行了，但是viewDidUnload却是没有.看了一下api文档,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Called when the controller’s view is released from memory. (Deprecated in iOS 6.0. Views are no longer purged under low-memory conditions and so this method is never called.)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;所以这个是其实是在iOS5上只有当出现Receiving memory warning,才会被调用.&lt;/p&gt;
+
+&lt;p&gt;反过头来，我觉得那么Detail VC的viewDidUnload是没有被调用，但是dealloc方法应该是被调用了，那么内存占用率应该是降下来才对啊，但是却发现dealloc根本木有被执行.&lt;/p&gt;
+
+&lt;p&gt;所以猜测应该是这个对象依然仍然被引用着，导致无法被回收。 仔细看了看代码，使用了最笨的调试方式--就是删除所有代码，只保留非常基础的代码之后发现依然没有被调用。 接着看了看它的父类，果然发现了问题.&lt;/p&gt;
+
+&lt;p&gt;在BaseViewController的viewDidLoad中发现了下面代码：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;[NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(updateSyncStatus:) userInfo:nil repeats:YES];
+[self updateSyncStatus:nil];
+
+
+(void)updateSyncStatus:(id)sender {
+     BOOL nowSyncing = ([[SyncManager sharedInstance] uploadInProgress] || [[SyncManager sharedInstance] downloadInProgress]);
+     if (nowSyncing!=self.syncing) {
+        ....
+     }
+ }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;你可以发现代码中只有初始化timer，却没有相对的invalidate timer的代码，但是本应该被释放的对象无法被回收，致使内存占用率居高不下.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;The dealloc method was not being called if any of the references held by a viewcontroller were still in memory
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;将初始化timer放到viewWillAppear，invalidate timer的代码放到viewWillDisappear变解决了问题. &lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Solve OpenSwan(Ipsec) L2tp netlink XFRM_MSG_DELPOLICY error</title>
+   <link href="http://tuohuang.info/solve-openswan-l2tp-netlink-XFRM_MSG_DELPOLICY-error"/>
+   <updated>2013-01-24T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/solve-openswan-l2tp-netlink-XFRM_MSG_DELPOLICY-error</id>
+   <content type="html">&lt;h1&gt;Setup VPN&lt;/h1&gt;
+
+&lt;p&gt;Recently I bought a vps to setup VPN. The OS is Debian 6.
+Well I'm using OpenSwan(IPsec) + L2tp and follow the instructions from this website:&lt;a href=&quot;http://freenuts.com/how-to-set-up-a-l2tpipsec-vpn-in-a-vps/#iJeUrbJARCIcU8jk.99&quot;&gt;How To Set Up A L2TP/IPSec VPN In A VPS&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Everthing works fine. &lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ipsec verify &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Prints shows that everything works good. &lt;/p&gt;
+
+&lt;p&gt;But I often get this error in /var/log/auth.log and I can't connect to VPN server:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ERROR: netlink XFRM_MSG_DELPOLICY response for flow eroute_connection delete included errno 2: No such file or directory    
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I do search on google and openswan forum. But there isn't any clear/direct answer to this quesiton.&lt;/p&gt;
+
+&lt;h1&gt;XFRM&lt;em&gt;MSG&lt;/em&gt;DELPOLICY? WTF!!!&lt;/h1&gt;
+
+&lt;p&gt;Until I saw the this post on OpenSwan forum : 
+        &lt;a href=&quot;https://lists.openswan.org/pipermail/users/2011-April/020411.html&quot;&gt;What's xl2tpd's 'ERROR: netlink XFRM&lt;em&gt;MSG&lt;/em&gt;DELPOLICY ...' about?&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;The answer is really brief.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;gt; 2) I have all along been experiencing the behavior in OpenSwan that I think is a documented bug:  When I disconnect my iPhone from the VPN, I need to restart it with /etc/init.d/ipsec restart before I'm able to reconnect.  Is there a known fix to this?  I actually have an idea on how I can set up a password-protected URL to remotely restart it, so in a pinch, I can get that working, but obviously a proper fix would be ideal.
+That's a known apple bug, and should be resolved if you use openswan 2.6.33 and xl2tpd 1.2.8
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here is solution: make sure you have correct version of OpenSwan and Xl2tpd.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo ipsec --version    
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then you get following info:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Linux Openswan U2.6.34/K3.0.0-12-generic (netkey)
+See `ipsec --copyright' for copyright information.
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Check Xl2tpd version by running:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sudo xl2tpd --version
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then you get:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;xl2tpd version:  xl2tpd-1.2.8
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;So make sure you get OpenSwan 2.6.33 installed. &lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd /usr/src
+wget http://www.openswan.org/download/openswan-2.6.33.tar.gz
+tar zxvf openswan-2.6.33.tar.gz
+cd openswan-2.6.33
+make programs install
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;But failed. Because that version is not compatible with current kernel version.&lt;/p&gt;
+
+&lt;p&gt;Then I try version 2.6.34 and it got isntalled.&lt;/p&gt;
+
+&lt;p&gt;Then you config the /etc/ipsec.conf and ipsec.secrets.&lt;/p&gt;
+
+&lt;p&gt;Do remember to reboot to make ipsec work.&lt;/p&gt;
+
+&lt;p&gt;After reboot, try &lt;em&gt;/etc/init.d/ipsec restart&lt;/em&gt; and &lt;em&gt;ipsec verify&lt;/em&gt;  and it should work.&lt;/p&gt;
+
+&lt;p&gt;Yep!&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>2013年1月下旬PUA成长计划总结</title>
+   <link href="http://tuohuang.info/project-pua-in-2013-january"/>
+   <updated>2013-01-22T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/project-pua-in-2013-january</id>
+   <content type="html">&lt;p&gt;2013年1月18-20日，我作为老学员旁听了蓝色答案的&lt;a href=&quot;http://blog.sina.com.cn/s/blog_690ef77c0100y120.html&quot;&gt;PUA成长计划&lt;/a&gt;课程。由于白天有事，我主要参加的是夜店game。&lt;/p&gt;
+
+&lt;p&gt;周五、周六的夜店活动，我感觉自己有了不少进步，不再像以前一样手足无措呆若木鸡地贴在墙边观望。&lt;/p&gt;
+
+&lt;h2&gt;关于搭讪&lt;/h2&gt;
+
+&lt;p&gt;说说其中一次出手吧。周五那晚，11点左右，人特别多，我堵在通往卫生间和舞池的过道处，只好等待。这时进来两个娇小可爱的MM，前面那个穿皮草的MM很吸引我，她们从我身边挤过去，皮草MM踩上我了，我感觉到她的鞋跟还在我的鞋上，不过不严重，我拍拍她，跟她说你踩上我了，她很不好意思地冲我笑笑，把脚移开，然后转身继续往前挤。之前看到的只是她的侧面，她这一笑，我看清楚了她的脸，挺精致的一张娃娃脸，有点日系甜美系的感觉。我又拍一下她，跟她说“你是日本人吗？我觉得你挺可爱。。。”话没说完，她就被人潮挤走了。&lt;/p&gt;
+
+&lt;p&gt;我回到卡座，发现新学员彬彬已经拉了个三人组，正在互动，answer说那两个障碍OK了，她们自己可以照顾自己，我们就不要过去了，其他人就和答案一起下楼去舞池寻找目标。&lt;/p&gt;
+
+&lt;p&gt;在楼下吧台附近，我又看见皮草MM，正在犹豫，answer说，这个位置就可以了，很合理，我一愣“什么？这里离皮草MM还有一段距离，怎么。。。”answer示意我看左边，我正才发现我左边吧台的位置有两个高挑的妹面向吧台，她们是背对我们。我现在面对answer，光注意他身后的皮草妹了，没注意别的地方。answer说“等旁边的买完酒，转过身来，我们就可以搭了”当高妹转过身，答案出手了，说完开场白，对方摆了摆手，answer也没强求。童鞋们，我们出来搭讪的，被打枪是正常的，我曾经也在MIX目睹过浪迹和answer同时在我眼前搭讪，同时被打枪，他们的情绪并没有因此而受影响，礼貌地走开，继续搭其他组合。这时我让answer看他身后的皮草妹，他看了一眼，说“这个挺好，你去吧，你不去我去了”。“好，我去！” 我走到目标旁边，侧身站她旁边，招手打了个招呼，“Hi，记得我吗？刚才楼上见过” 后面就简单聊了几句，最后邀请她一会儿到我们卡座坐一会儿，但是那时候我们卡座满了，我只能说“一会儿过来找她”，其实结果不重要了，我勇敢走到她身边打了招呼，这已经迈出一大步了。&lt;/p&gt;
+
+&lt;p&gt;answer后来说，搭讪的时候说话要慢，注意停顿，动作也要慢，不要突然一下子身体倾向目标，再突然一下收回来，这一点我以前还没意识到，以后多注意。&lt;/p&gt;
+
+&lt;h2&gt;关于互动&lt;/h2&gt;
+
+&lt;p&gt;后来，遇到以前在ppg搭过的一个妹，叫Mandy,看见她的时候她急急忙忙往外走，我就追出去，跟她打招呼，聊了几句，得知sensation存衣处满了，她带两个朋友去隔壁存衣服，我看她两个朋友也还不错，就邀请她们一会儿存好衣服去我们卡座坐坐。后来在舞池发现她们，就很自然地拉她们三个上楼了，个人觉得，在夜店，打个招呼混个脸熟还是有好处的。&lt;/p&gt;
+
+&lt;p&gt;我和mandy互动，把她两个朋友发给查克和mango。answer在旁边观察，他跟我说，你的注意力一直在她身上，我说她比较难聊，我也不知道怎么互动下去了，“让我来”answer提出和我换位置，他去互动mandy，我在旁边观察。能够近距离观察高手互动，这也只有现场课能做到。&lt;/p&gt;
+
+&lt;p&gt;后来跟answer分析当时的情形，他说我注意力过分集中在她身上，这从我的身体朝向、头的朝向等细节都可以看出来，而且我不断找话题。他的做法是，合理停顿，做自己的事，不要老想这引起她的注意力。&lt;/p&gt;
+
+&lt;h2&gt;关于升高&lt;/h2&gt;
+
+&lt;p&gt;周六白天的课，正好讲到夜店互动，我们谈起周三和查克一起在MIX互动的一组妹。当时我和目标互动挺多，她反应很好，她还拉我去跳舞，主动把手搭我肩上，我摸她的头发和腰都没拒绝，用蓝色答案的术语说就是“购买度”够了。那对于一段故事来说，缺什么呢？那就是升高关系，answer说，我和她在舞池跳舞的时候，就该kiss了。我说我当时没准备好 ⊙﹏⊙b answer说，不要老想着准备好了再去行动，只要你内心坚定，明确的知道自己要做什么，去行动就可以了，就算她躲开了，那种性张力已经有了。购买度只是情境下的东西，过了那个情境，就什么都不是，很多时候我们去夜店，和姑娘互动的很好，但是出了夜店过几天再联系就怎么也约不出来，就是这个原因。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;更多精彩内容请看蓝色答案的博客&lt;a href=&quot;http://blog.sina.com.cn/answer3244158&quot;&gt;http://blog.sina.com.cn/answer3244158&lt;/a&gt;  &lt;/p&gt;
+
+&lt;p&gt;欢迎加入北京pickup群  123657731  我们共同进步&lt;/p&gt;
+
+&lt;p&gt;想加入PUA成长计划的兄弟，可以咨询蓝色答案助理Dave QQ:274597195。蓝色答案方法QQ群：175910191&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>iOS解决CSV文件的中文编码问题</title>
+   <link href="http://tuohuang.info/ios-handle-non-ascii-encoding-problem-for-csv"/>
+   <updated>2013-01-18T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/ios-handle-non-ascii-encoding-problem-for-csv</id>
+   <content type="html">&lt;h2&gt;起因&lt;/h2&gt;
+
+&lt;p&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;最近一次iOS项目中需要按照CSV格式拼装字符串然后添加到邮件作为附件。但是在这个过程我遇到两个很常见的问题：CSV格式和non-ascii编码及BOM(Byte Order Mark)字节顺序标记。&lt;/p&gt;
+
+&lt;h2&gt;CSV格式&lt;/h2&gt;
+
+&lt;p&gt;这个比较棘手过程开始于：因为将要发送的CSV字符串中有中文符号（数据统计相关的东西），所以我需要支持unicode编码。
+&lt;br/&gt;
+当然最简单的实现方式是:
+Liquid error: undefined method `join' for #&lt;a href=&quot;String:0x007f9b93550c18&quot;&gt;String:0x007f9b93550c18&lt;/a&gt;&lt;br&gt;
+&lt;br/&gt;
+我们创建了一个&lt;em&gt;MFMailComposeViewController&lt;/em&gt;实例，然后以逗号作为分隔符，'\n'作为换行标记来拼接我们的CSV字符串。在最后，我们设置数据的编码为&lt;em&gt;NSUTF8StringEncoding&lt;/em&gt;.没什么特别的。
+&lt;br/&gt;
+**然后你迫不及待的从邮箱中下载打开CSV文件，但是发现却是一坨乱码！ **
+&lt;br/&gt;
+分隔符貌似没有效果，所有的数据都挤在了一个格子里，而且只有一行。&lt;/p&gt;
+
+&lt;h5&gt;修复&lt;/h5&gt;
+
+&lt;p&gt;很简单的一个修复办法是将逗号替换为tab('\t')，并且将换行符替换为'\r\n'.如果你不这么做，它就没办法工作。 @_@
+&lt;br/&gt;
+下面是一个修复的版本：
+Liquid error: undefined method `join' for #&lt;a href=&quot;String:0x007f9b9354fdb8&quot;&gt;String:0x007f9b9354fdb8&lt;/a&gt;        &lt;/p&gt;
+
+&lt;p&gt;现在你重新试一下，会发现格式已经正确了，有正确的格子数和行数。&lt;br&gt;
+&lt;br/&gt;
+&lt;strong&gt;新的问题是： 每个格子的中文都是乱码？&lt;/strong&gt;
+&lt;img src=&quot;/static/images/20130118/1.png&quot; alt=&quot;乱码&quot;&gt;
+&lt;/p&gt;
+
+&lt;h2&gt;Non-ASCII编码以及BOM&lt;/h2&gt;
+
+&lt;p&gt;要解决这些乱码问题，首先我们需要指导为什么我们可以通过向CSV文件的头部插入BOM的方式来消除乱码？长话短说，就是它一个让文件接收方知道发送方使用了何种Unicode编码方式的标记，所以通过它我们可以正确的解析字符流。
+&lt;br/&gt;
+通过&lt;a href=&quot;http://en.wikipedia.org/wiki/Byte_order_mark&quot;&gt;BOM Wiki&lt;/a&gt;，我们指导utf-8的十六位表示是&amp;quot;EF BB BF&amp;quot;. 接着我们可以将其添加到CSV字符串的头部，
+然后特别需要的是将编码格式从utf-8改为utf-16，否则中文将无法正常显示。&lt;/p&gt;
+
+&lt;p&gt;下面是最终代码：
+Liquid error: undefined method `join' for #&lt;a href=&quot;String:0x007f9b9354f1b0&quot;&gt;String:0x007f9b9354f1b0&lt;/a&gt;    &lt;/p&gt;
+
+&lt;p&gt;你可以很奇怪，我们应该只需要在头部添加BOM标记就好啦， 为什么每一行内容都需要添加这个标记？
+具体原因我无法解释，但是如果不加了，那么显示一行可能没问题，但是如果一旦显示超过四五行的内容，就会出现奇怪的乱码。&lt;br&gt;
+&lt;img src=&quot;/static/images/20130118/2.png&quot; alt=&quot;乱码&quot;&gt;
+  &lt;/p&gt;
+
+&lt;p&gt;&lt;br/&gt;
+Okay 搞定!&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>夜店搭讪训练计划</title>
+   <link href="http://tuohuang.info/pick-up-project"/>
+   <updated>2012-12-13T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/pick-up-project</id>
+   <content type="html">&lt;p&gt;有很多人一开始去夜店不知道该做什么，而很多经常去夜店的人不知道自己在做什么？光假high是没有前途的。&lt;/p&gt;
+
+&lt;p&gt;我们去夜店的目的是什么呢？是为了找个目标能带走吗？对我来说，现在的目的不是这样的，我希望通过练习来提高自己接近目标的能力以及语言表达能力。能力提高了，后面的事就水到渠成了。打开组合之后跟目标建立连接的阶段等现阶段突破之后再重点练习。&lt;/p&gt;
+
+&lt;p&gt;在夜店里能够接近自己想搭的目标，是后面进行互动的基础，所以最近一阶段我会集中训练这项技能。&lt;/p&gt;
+
+&lt;p&gt;我在训练过程中采用循序渐进的方式：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;只开组，聊几句就走，暂不收号&lt;/li&gt;
+&lt;li&gt;开组，尽量多互动，练表达，尝试讲惯例&lt;/li&gt;
+&lt;li&gt;开组，尽量互动，尝试转移，如果不能转移，就继续互动并尝试连接式的kino&lt;br&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;注意事项：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;牢牢记住自己的目的是练习，专注于自己和对方的感受&lt;/li&gt;
+&lt;li&gt;开场白时，语速放慢，有停顿&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;相关链接：&lt;a href=&quot;http://t.cn/zOROIcu&quot;&gt;《PUA成长路线图》&lt;/a&gt;&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>我的泡学感想</title>
+   <link href="http://tuohuang.info/pick-up-diary"/>
+   <updated>2012-12-09T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/pick-up-diary</id>
+   <content type="html">&lt;p&gt;昨天参加蓝色答案分享会，我分享了这些年接触泡学的感想，答案鼓励我都写下来，这样既能帮助更多的人，也能提醒自己。&lt;/p&gt;
+
+&lt;p&gt;我是2008年7月经同学介绍接触泡学的，他成长得非常快速，几个月后他找到了自己的真爱，去年已经结婚。&lt;/p&gt;
+
+&lt;p&gt;而我始终不得其法，光是看书看帖子几乎没有实战。那时候我和很多接触泡学的人一样，就是想搞清楚和女生交往的秘密，就是想找个女朋友。不瞒大家，我大学四年，研究生三年都没有谈过恋爱，不懂和女生怎么相处。我也和所谓的pua去过一次夜店，不喜欢夜店的感觉，所以去了一次就再也没去了。那时候论坛里的帖子让我觉得泡妞需要欺骗，我不想成为这样的人，我只是想找个女朋友，想让女人喜欢我。这样我就进入了误区，觉得可以不用进入S阶段，甚至连C阶段都可以不要。从2008年到2010年上半年，我认识了3个女生，接连展开追求，但都失败了。&lt;/p&gt;
+
+&lt;p&gt;我就这样浑浑噩噩过了3年，2010年底在佳缘上认识了个女生，很快她成了我女朋友，但在我们关系的进展中，她是主动的一方。我们在一起大约10个月，后来因为一些原因不得不分手。我很感谢她，她陪我度过了一段非常美好的时光，也逐渐改变了我。&lt;/p&gt;
+
+&lt;p&gt;和ex分手后，我跟泡学网上认识的Chuck深入聊了几次，可以看我当时写的两篇日志&lt;a href=&quot;http://impua.info/2012/03/23/talk-with-hanbin.html&quot;&gt;1&lt;/a&gt;和&lt;a href=&quot;http://impua.info/2012/03/25/feel-in-the-deep.html&quot;&gt;2&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;我和他仔细一分析，才意识到当年我失败的原因有下面几点&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;我以为只要吸引够了就行，结果只停留在吸引，然后时间不长，女生的注意力就转移了。等我觉得进展不下去的时候，就盲目表白，结果很自然地收了好人卡。最可恨的是，当时女生说现在没准备好谈恋爱，结果很快她就投入别人的怀抱了。&lt;/li&gt;
+&lt;li&gt;跟原来自闭的我相比，我已经不在沉默，但是在和女生聊天的过程中，不知道自己聊天的目的是什么，光在说那些有的没的，没有形成互动，没有表达对对方的感受，没有建立连接。&lt;/li&gt;
+&lt;li&gt;没有勇敢地kino升高。我那时候有误区，觉得不用kino，我要用我自己的方法，光靠吸引，让女生爱上我，成了我女朋友再有身体接触。现在看来，我那时候真是幼稚的可笑，也很可怜。&lt;/li&gt;
+&lt;li&gt;因为长期得不到很好的回应，就开始怀疑自己的价值，让自己的心情很差，带着负能量跟人相处，只会把人吓跑。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;原因找到了还不够，还要在实践中锻炼自己的能力。我今年7月底参加答案的线下课程，也经常去夜店练习，但多少有些盲目，偶尔能带走目标（例如&lt;a href=&quot;http://impua.info/2012/08/29/eyes-on-me.html&quot;&gt;1&lt;/a&gt;和&lt;a href=&quot;http://impua.info/2012/10/15/love-in-shanghai.html&quot;&gt;2&lt;/a&gt;），那也是运气的成分多一些，我并没有训练出一定的社交直觉、语言表达能力、kino的行动力。也进入了另一个误区，就是觉得把到妹能带走TD才是目的，这几天重读了好几遍&lt;a href=&quot;http://weibo.com/answerpua&quot;&gt;@蓝色答案&lt;/a&gt;的&lt;a href=&quot;http://t.cn/zOROIcu&quot;&gt;《PUA成长路线图》&lt;/a&gt; 很受启发。&lt;/p&gt;
+
+&lt;p&gt;我接下来几个月的目标，去夜店练习的时候，要锻炼毫不犹豫地接近目标、基本的语言表达能力、提升购买度、建立连接、建立亲密关系的能力。这样思路很清晰，再不能像以前一样进了夜店像没头苍蝇一样乱撞，就算瞎猫碰到死耗子也不能说明我的能力就够了。&lt;/p&gt;
+
+&lt;p&gt;关于男女的关系，答案告诉我们不要欺骗，和一个喜欢的女孩发生亲密关系本身没有错，不需要背上沉重的道德包袱，而且要尊重对方。在亲密之后坦诚地表达自己对双方关系的考虑，没有欺骗，就没有伤害。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>Android listview remember selection and set default selection</title>
+   <link href="http://tuohuang.info/android-listview-remember-selection-and-set-default-selection"/>
+   <updated>2012-10-28T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/android-listview-remember-selection-and-set-default-selection</id>
+   <content type="html">&lt;p&gt;From an iOS developer's perspective, I find that it is extremely hard to apply features like &amp;quot;&lt;strong&gt;set default selection when starting&lt;/strong&gt;&amp;quot; and &amp;quot;&lt;strong&gt;remember selection status after user clicked row&lt;/strong&gt;&amp;quot; to ListView. &lt;/p&gt;
+
+&lt;p&gt;So let's start with &lt;strong&gt;&amp;quot;remember selection&amp;quot;&lt;/strong&gt; first.The problem is that even if you know that 
+you can use selector xml to define highlight/pressed/focus style.But that style will not 
+be kept after user clicked that row. For instance, I have a highlighting selector xml (list_selector.xml under res/drawable folder) like this (but you may have other fields need to highlight like text color of textview in row):
+Liquid error: undefined method &lt;code&gt;join' for #&amp;lt;String:0x007f9b93025630&amp;gt;
+and list_selector_pressed.xml which defined the highlighting style--set the background color
+to a gray color :
+Liquid error: undefined method&lt;/code&gt;join' for #&lt;a href=&quot;String:0x007f9b930240a0&quot;&gt;String:0x007f9b930240a0&lt;/a&gt;
+So as @David Hedlund suggested:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Rather, assign an OnItemClickListener, and have it store away the id of the selected item into some variable. &lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;you need to create a instance variable on top of your class:
+Liquid error: undefined method &lt;code&gt;join' for &amp;quot;\n        private View currentSelectedView;\n&amp;quot;:String
+then go to 
+Liquid error: undefined method&lt;/code&gt;join' for #&lt;a href=&quot;String:0x007f9b9301fc58&quot;&gt;String:0x007f9b9301fc58&lt;/a&gt;
+Pretty simple: we check if currentSelectedView is null or current clicked view or not. we first to unhighlight any style by calling method unhighlightCurrentRow(currentSelectedView)---you may wonder why we pass instant variable currentSelectedView as parameter, I will explain it later.  Then we assign view to currentSelectedView and highlight current row; so that the style will persist after user's clicking is done.&lt;/p&gt;
+
+&lt;p&gt;Liquid error: undefined method `join' for #&lt;a href=&quot;String:0x007f9b9301c0f8&quot;&gt;String:0x007f9b9301c0f8&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Aha, that's it. That is how we implement &amp;quot;remember selection&amp;quot; for list view. As you see, 
+we have to duplicate the codes for styling both in xml and java code--pretty stupid :(&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Next about &amp;quot;set default selection&amp;quot;&lt;/strong&gt;. You may think that you can do this 
+Liquid error: undefined method `join' for #&lt;a href=&quot;String:0x007f9b93619640&quot;&gt;String:0x007f9b93619640&lt;/a&gt;&lt;br&gt;
+in onCreate() in activity or onActivityCreated() in fragment.&lt;br&gt;
+But if you run it , you will get NullPointer exception and why ?
+because at this time, the listview is not rendered yet and Android doesn't like iOS which have viewWillAppear. SO you have to create an instant variable to remember whether it is first time to render listview cell and in onListItemClick to unset that variable:&lt;/p&gt;
+
+&lt;p&gt;So under currentSelectedView declaration:
+Liquid error: undefined method `join' for &amp;quot;\n    private Boolean firstTimeStartup = true;\n&amp;quot;:String
+then add methods : suppose we want to highlight the first row in list view:&lt;/p&gt;
+
+&lt;p&gt;Liquid error: undefined method &lt;code&gt;join' for #&amp;lt;String:0x007f9b93617868&amp;gt;
+Pretty simple.
+But you need to make some changes in onListItemClick method:
+Liquid error: undefined method&lt;/code&gt;join' for #&lt;a href=&quot;String:0x007f9b936170e8&quot;&gt;String:0x007f9b936170e8&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;There you go! Enjoy Android :)&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>情迷上海滩</title>
+   <link href="http://tuohuang.info/love-in-shanghai"/>
+   <updated>2012-10-15T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/love-in-shanghai</id>
+   <content type="html">&lt;blockquote&gt;
+Hi，我是Allen华尔兹。七月底参加了蓝色答案的线下课程，后来参加过几次答案的夜店活动，正在缓慢进步中。九月中旬我去上海出差，正好答案也在上海，就过去参加他们的活动，没想到遇到了一个很特别的女孩，于是就有了这篇FR
+&lt;/blockquote&gt;
+
+&lt;p&gt;江湖上传言：只要有蓝色答案在的地方，就会有故事发生...&lt;/p&gt;
+
+&lt;p&gt;这次来上海也一样，Dave也有精彩的收获，请看&lt;a href=&quot;http://paoxue.com/thread-229006-1-1.html&quot;&gt;黄浦江畔的浪漫邂逅：从一杯苏打水到激情一夜的故事&lt;/a&gt; 。&lt;/p&gt;
+
+&lt;h2&gt;第一天&lt;/h2&gt;
+
+&lt;p&gt;那天是个周日，我下了火车放下行李就去MUSE2找answer他们。&lt;/p&gt;
+
+&lt;p&gt;因为这次去出差的，我就穿了身正装过去。本来以为会这身行头太过正式，到了夜店一看，我们这帮人都是西服，休闲和偏正式的都有。Dave解释说，上海的夜店金钱味比较重，穿西服显得是社会精英。我跟上海各位兄弟打了招呼各自介绍了一下，就开始行动了。&lt;/p&gt;
+
+&lt;p&gt;周日行情不是很好，看得过去的妹子不是驻场就是在别人卡座里。我转了几圈回到卡座，看见答案不知什么时候从外面拉了三四个妹到卡座，正在game。&lt;/p&gt;
+
+&lt;p&gt;12点后我和frank一起巡视，那晚我表现太差了，一直都有焦虑，没有出过手。看到Dave和Michael拿着酒到散台找到一个四人组喝酒互动，我和frank也回卡座拿酒过来继续找目标。frank看到吧台靠近门口的地方有个妹，她应该是一个人来的，示意我去搭，这次我没有犹豫，从她后面走到她的旁边，凑到她的耳旁说了句“hi，你好！你是一个人来的吗？”然后退回来，她转到身看看我，我也看清楚了她，摸样还挺清秀的，个子大概有165。&lt;/p&gt;
+
+&lt;p&gt;她没摆手，也没走开，就说了句“是啊”，这已经是很好的回应了。我继续“我和朋友在那边卡座玩，能邀请你一会儿过去坐坐吗？”&lt;/p&gt;
+
+&lt;p&gt;“好！”&lt;/p&gt;
+
+&lt;p&gt;这么短促有力又不带犹豫的回答，我还第一次见。&lt;/p&gt;
+
+&lt;p&gt;“那边刚才人比较多，我先问问朋友现在什么情况，再过来找你吧”然后我就去找frank，问他那边卡座有位置没，要是拉妹子过去发现没空位就尴尬了。确认情况后就去找妹子，带她去卡座，这一路我没去牵她的手，这个我可能做的不够好，我觉得一见面就去牵手不礼貌，现在想想，其实不牵手也可以，要带领她，又要让她有安全感，还要靠谱，我去拉她的手腕会不会更好呢？希望高手能给我个解答。&lt;/p&gt;
+
+&lt;p&gt;到了卡座以后，先是简单的基本信息交换，“你叫什么？”，其实我只要一个代号就可以，比如我们出去泡妞都起个英文名，这样也好记。遇到姑娘回答真名还真为难，夜店太嘈杂，听不清而且还记不住。她说叫vivian，这说明她不是第一次来夜店了。&lt;/p&gt;
+
+&lt;p&gt;vivian说话有点台湾腔，我问她“你是台湾人吗？”&lt;br&gt;
+“不是，你猜。”&lt;br&gt;
+“你猜我猜不猜？” 套用了答案的经典回答。&lt;br&gt;
+后来得知她是福建厦门的，离台湾这么近，难怪说话这样。&lt;/p&gt;
+
+&lt;p&gt;聊了一会儿，我们就玩游戏，游戏玩累了就继续聊天。我看见她的指甲有点特别，指甲油是白色的，指甲还剪的形状也少见，就去摸她的指甲&lt;/p&gt;
+
+&lt;p&gt;“你的指甲好特别啊，是不是真的。”顺势拿起她的手，说“你的手好小啊”，然后用自己的手和她的手比一下。&lt;/p&gt;
+
+&lt;p&gt;后来聊的话题就比较杂了，记不清了，只记得聊着聊着我就搂着她的肩膀说话，后来，当聊到了哲学，她就像打开了话匣子一样滔滔不绝，那时候就不需要我来找话题了，我几次想把话题转到别的方向都被她转过来，看来是遇到文艺女青年了。&lt;/p&gt;
+
+&lt;p&gt;夜店里的人纷纷离场，答案他们也带目标转场吃宵夜去了。卡座上只剩下我和vivian，现在想想，我早就应该带她转场吃宵夜了，她已经和我这么无聊地在卡座上坐了那么久，还不愿离去，这说明她的窗口还挺大的。&lt;/p&gt;
+
+&lt;p&gt;我终于提出去吃夜宵了。&lt;/p&gt;
+
+&lt;p&gt;我们走出夜店，她说冷，我就把外套脱下来给她披上，她嘴上说不用，这时候不需要问女人意见，直接给披上，该表现体贴的时候就要体贴。&lt;/p&gt;
+
+&lt;p&gt;到了吃夜宵的店，点了麻辣小龙虾和生蚝什么的，她吃得很开心，我们还聊到喜欢的动漫，原来我们都喜欢one piece。在聊天过程中，我用乐鱼某个视频里的方法，不断表达对她的感受，比如聊到中间说“真没想到我们是在酒吧认识的！”，然后转到别的话题，过了一会儿说“如果你在北京，或者我在上海就好了，这么可以经常找你一起玩”。&lt;/p&gt;
+
+&lt;p&gt;那天我犯了个错误，进到饭馆的时候，没有和她坐在同侧，这样就不够亲密了。&lt;/p&gt;
+
+&lt;p&gt;时间一分一秒的过，我看还没有实质进展，天亮以后我还要参加个会议，不能继续拖，就说“和你在一起的时候时间过得好快，不过我明天还要开一天的会，我们走吧，先送你回去”&lt;/p&gt;
+
+&lt;p&gt;在车上，我要了她电话，说这两天有空找她玩。&lt;/p&gt;
+
+&lt;p&gt;送她到楼下，她下了车，我注意到她并没有转身就走，而是看着我的车开走。莫非她有所期待？这是个迷，如果这时候，我下车，跑回去给她个Goodbye kiss，后面的故事会不会不一样呢。比如像《喜爱夜蒲》里的一幕：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/Swbrb.jpg&quot; alt=&quot;Goodbye kiss&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;快到酒店的时候，收到她的短信，问我到没，后来又一回2、3个回合，能感觉出她对我有点热度。&lt;/p&gt;
+
+&lt;p&gt;回到酒店，无心睡眠，上了会儿网，看到答案微博里有这么一条：&lt;/p&gt;
+
+&lt;blockquote&gt;
+成为恋爱达人，有一个很有趣的标志，就是当你跟女孩子在超过晚上11点还单独在一起，而且她并不想离开的时候。你敢不敢说出那句话“我们找个地方休息一会儿”。很久以前，我第一次说的时候，非常紧张，冷汗直接就从额头顺着脸颊流下来.....
+&lt;/blockquote&gt;
+
+&lt;p&gt;靠！这不是在说我吗？&lt;/p&gt;
+
+&lt;h2&gt;第二天&lt;/h2&gt;
+
+&lt;p&gt;那天白天我跟查克和答案电话沟通过，他们说当晚没TD的话，再约出来就要重新营造气氛，因为mm已经不在当时的情绪下了，关系推进会很慢。事实证明，他们是对的。&lt;/p&gt;
+
+&lt;p&gt;忙完一天的事之后约vivian晚上见面，我住的酒店附近有条街两边都是酒吧，我打算约她到sasha，那是座老洋房，庭院放了很多沙发和椅子，蛮有情调的。可能因为那天是周一，也可能我们去的有点早，sasha没有人，一点气氛都没有。&lt;/p&gt;
+
+&lt;p&gt;我们又去人民公园湖中间的一个中东风情酒吧，主要是喝酒聊天，还点了支水烟尝试一下。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/msjXO.jpg&quot; alt=&quot;BARBAROSSA芭芭露莎酒吧&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;果然因为不在夜店的气氛，又不是第一次见面，关系推进很慢，我和她只有简单的舒适感kino。眼看中时间一分一秒的过，我和她却毫无进展，心里有些着急，但这种着急我不能表现出来。&lt;/p&gt;
+
+&lt;p&gt;12点多了，我们周围的人也换了一波又一波，我提出下去走走，换个环境也许会好一些，公园里也许有比较黑的地方，那时候有机会更放肆地kino。不过我对这里不熟，公园能看到的地方还很亮，这里要提醒各位了，一定要带MM去你熟悉的地方，做到心中有数。&lt;/p&gt;
+
+&lt;p&gt;vivian问我接下里去哪儿，还好她没说时候不早该回家了，我觉得这也是个信号，表明她还愿意跟我待在一起。&lt;/p&gt;
+
+&lt;p&gt;我说“我明天就走了，来了也没好好转转，下次不知什么时候才能来。听说田子坊不错，我们去转转吧”她没反对。&lt;/p&gt;
+
+&lt;p&gt;到了田子坊，那里除了空荡荡的小巷和店铺，就只剩下三三两两的客人在路边酒铺喝酒，这个景象也蛮有味道的。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/RFe30.jpg&quot; alt=&quot;田子坊&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;她说“我白天来过几次，白天很热闹”&lt;br&gt;
+我说“虽然你来过好多次，那你有跟我一起来过吗？有跟我手牵手来过吗？”其实当我前半句的时候，我就去牵她的手了。&lt;br&gt;
+她没有反抗，还有点吃惊，另一只手捂脸，娇羞（或者假装娇羞）地说“我们是在拍电影吗？”&lt;br&gt;
+“是啊，导演安排的。”我继续牵着她，往巷子外面走。&lt;/p&gt;
+
+&lt;p&gt;我说想去外滩走走，她说知道外滩三号上面有个酒吧可以看黄浦江的夜景，我们就去了，那时候已经2、3点了，又加上是周一，过去一看，除了保安和服务员就没别人了，站在窗前看了下江景我们就下楼了，我说有点饿，吃点东西吧。&lt;/p&gt;
+
+&lt;p&gt;上海这种能吃夜宵的地方真多，而且一条街都是一个风格，要么一条街的烧烤要么一条街的火锅。桌子很大，我还是跟她坐到同一侧，这是必需的。&lt;/p&gt;
+
+&lt;p&gt;我发现她吃东西的时候总是变得很活跃，没办法，吃货的特征就是这样。我认为我们的关系可以更进一步是当她开始问我感情经历的时候。&lt;/p&gt;
+
+&lt;p&gt;“你以前有几个女朋友？”&lt;/p&gt;
+
+&lt;p&gt;女人为什么总爱问这样的问题呢？“2个，准确地说是一个半，第二个在一起没多久就分了，分了也没多久。。。”
+这给我一个启示，其实我在game过程中，到一定阶段可以主动问女生的感情经历，一是可以分享感受，二也是表明对她有兴趣。&lt;/p&gt;
+
+&lt;p&gt;她也讲了她的故事，似乎每个去夜店的女生都有一段离奇的故事。&lt;/p&gt;
+
+&lt;p&gt;当我们聊到美剧Big bang theory的时候，我拿出手机，打开一个叫Whip（鞭子）的应用程序，这个程序在某集中出现过，只要拿着手机像甩鞭子一样一挥，就会发出鞭子的响声。我问她看过这集没有，然后给她玩了会儿手机。&lt;/p&gt;
+
+&lt;p&gt;“可惜没有蜡烛”我坏笑道。&lt;br&gt;
+“什么意思啊”她不理解什么意思，我也不知道她是不是装的。&lt;br&gt;
+“少装了，以你的风格，应该喜欢在上面吧”我是想拉升性张力的，不过好像还没到那个气氛，她并没有去接话，只是笑笑，我也就继续扯别的了。&lt;/p&gt;
+
+&lt;p&gt;中间也聊到了为什么去夜店，我说觉得她这种文艺女青年，不像去夜店的那种，她说过去是为了体验生活，在夜店就好像看到另一个世界的人们在干什么，有点超脱的感觉。&lt;/p&gt;
+
+&lt;p&gt;她说想抽烟，我就去门口买了包中南海的薄荷烟，她还很懂行啊，说第一根烟要倒过来，我不知道这是哪儿的习俗，上次另一个姑娘也是这么说的。从这点上看，她应该没有表面看起来那么乖。我和她抽着烟，我看着她，笑着说“你抽烟的样子不是那种很女人很优雅的范儿，有点爷们儿，为什么呢？”马上就被她粉拳锤了几下。每次跟女生抽烟，我都会聊起《志明与春娇》这部电影，这部电影的英文名是Love in a Puff，puff就是吐出来的烟，挺应景的。&lt;/p&gt;
+
+&lt;p&gt;我讲起曾经在五道口lush酒吧遇到一个女生的故事。&lt;/p&gt;
+
+&lt;blockquote&gt;
+“我曾经梦想过在夜店能够邂逅一个不抽烟不喝酒不化浓妆的女孩。不过后来我发现，这些都不重要。去年在五道口的一个酒吧，遇到一个和你一样说话带台湾腔的女孩，她和朋友一起，喝着长岛冰茶。一开始以为她是个乖乖女，后来她朋友说她也会和同事一起抽烟，就问她看过《志明与春娇》没。她说很喜欢那部电影。....后来她从包里悠悠地掏出了一包ESSE香烟。我觉得她很可爱，挺喜欢这姑娘的，但当时没有说，后来，我们就没有后来了。有时候，一转身，就再也见不到了...”
+&lt;/blockquote&gt;
+
+&lt;p&gt;这故事后半部分是编的，我后来约过她几次，但是自己那时候完全不懂game，搞砸了，拿了好人卡。在酒吧我也跟好几个妹讲过这个故事，也算是表达自己感受的小故事吧。&lt;/p&gt;
+
+&lt;p&gt;和她在一起的时间过得好快啊，4点多了，再不转移的话，天都亮了，更加没戏了。走出饭馆，看到东边有点发亮。上了车，她先跟司机说了她家的地址，那时候，我还没有勇气提出去我那儿。&lt;/p&gt;
+
+&lt;p&gt;我大概喝了两瓶啤酒，就假装有点醉，头去靠她的肩膀，慢慢接近她的脸，然后趁她不注意就捧起她的脸在她嘴上亲了一下。她反抗不剧烈，我亲完之后就退回来，看她反应，没想到她咯咯地笑了，用一种撒娇一样的语气说
+“好啊，你敢偷亲我”
+“是啊，凶手在这里，代表月亮惩罚我吧”&lt;/p&gt;
+
+&lt;p&gt;过了一会儿，我又亲了她一下，然后释放。&lt;/p&gt;
+
+&lt;p&gt;到了她家楼下，我说“别走了，去我那儿吧”
+她有点惊讶，“啊？去你那儿啊” 但她没表态，当然啊，这时候不需要女人答应，她的行动已经很说明问题了。她坐在车的右侧，这是她选的，说这样上下车方便，所以，这时候如果她不愿意的话，完全可以打开车门就下去，车是停的。看她没有下去，我就跟司机说了酒店地址，让他开车。&lt;/p&gt;
+
+&lt;p&gt;开车后，我说“我只是想和你多待一会儿”
+“其实我也是。。。”她有点害羞地低下头&lt;/p&gt;
+
+&lt;p&gt;转移到酒店过程也很重要，查克再他的&lt;a href=&quot;http://paoxue.com/thread-234091-1-1.html&quot;&gt;帖子里&lt;/a&gt;也提过。在车里不要紧张，聊点轻松的话题，比如家庭什么的。比如我家小狗的趣事，我弟弟妹妹还有她姐姐的事。&lt;/p&gt;
+
+&lt;p&gt;她说“会不会有危险啊？”
+“我才有危险呢，我都醉成这样了，谁知道你是不是台湾派来的间谍”
+这时候司机师傅来了一句“是啊，女间谍都这么漂亮的”
+我也没想到上海的司机师傅这么逗，MM笑得花枝乱颤，车里的气氛非常好。&lt;/p&gt;
+
+&lt;p&gt;到了酒店，我让她洗澡，她不去，我就先洗，然后她说去洗脸卸妆，我就看电视，其实进了屋也没必要心急，慢慢来。等她进了被窝，我就不老实了，凑过去吻她的嘴、耳朵、脖子，然后往下。去抱她，然后抚摸她，手臂、背、腰、胸。她用手死死护住胸，我折腾了一会儿，她说“先睡吧，要不明天。。。” 我想她的意思是“要不明天没精神TD”吧，都已经这样了，睡醒之后再来吧。&lt;/p&gt;
+
+&lt;p&gt;醒来之后，手机已经没电了，也不知道那时是几点，我把窗帘拉严，她也怕屋里有光，害羞吧。我继续未完成的事业，她的抵抗虽然有，但并不是那种反抗qj的那种，很多讲怎么破除ASD的文章都讲过，我就不详细讲了，主要就是注意一步步来，反复挑逗，先解开bra再去摸下面，然后解除最后武装。&lt;/p&gt;
+
+&lt;p&gt;说三个小细节：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;过程中她说，我觉得你还挺有性吸引力的，我问是什么时候发现的，她说是当我们都在床上之后&lt;/li&gt;
+&lt;li&gt;当我试图解开Bra的时候，发现扣子不在后面，我就说了句“开关在哪儿呢”，她说“你猜”，我当然知道不在后面就在前面了&lt;/li&gt;
+&lt;li&gt;当我终于解除她下面的最后武装后，她说要去洗澡，又把小内内穿上了，回来之后我再去脱就没什么阻碍了。这就像打游戏一样，前面的关都过了。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;我和她度过了一个美好的中午。退完房和她吃了个饭我就直奔虹桥火车站了，幸好赶上火车了，说实话我不想走。&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;　　另外‘北京PICKUP群’实战人数已经突破300人，周3街搭，每周5、6夜店活动，群里每天有人实时为大家解答问题，欢迎志同道合的兄弟加入&lt;/p&gt;
+
+&lt;p&gt;北京PICKUP实战活动群：123657731&lt;/p&gt;
+
+&lt;p&gt;加群注明 泡学&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;下期 蓝色答案PUA成长计划的日期 10月26 27 28 地点北京，有意参加PUA蓝色答案课程的，可以加我QQ或加蓝色答案方法群报名&lt;/p&gt;
+
+&lt;p&gt;QQ 47702091&lt;/p&gt;
+
+&lt;p&gt;群号157271273&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://blog.sina.com.cn/u/1762588540&quot;&gt;http://blog.sina.com.cn/u/1762588540&lt;/a&gt;     蓝色答案博客&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>我的第一次夜店TD</title>
+   <link href="http://tuohuang.info/eyes-on-me"/>
+   <updated>2012-08-29T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/eyes-on-me</id>
+   <content type="html">&lt;p&gt;上周末我完成了夜店的第一次TD，当我跟mm说“和我一起回家吧”，她只说了句“好”，前前后后，像做梦一样。大家和我一起回顾一下这场梦吧...&lt;/p&gt;
+
+&lt;h2&gt;第一天 邂逅&lt;/h2&gt;
+
+&lt;p&gt;上周五和周六，我参加了蓝色答案的夜店活动，因为周五晚上我才从上海出差回来，去PPG的时候已经10点了，当晚叫了个住在附近的MM（以下简称Z）一起玩。不过我犯了个错误，我光顾着跟Z互动，浪费了当晚众多的资源。蓝色答案和他的两名学员，以及助教查克相继离场，我和Z还在卡座玩，已经很亲密了但没有k-close也没要提出KF的邀请，现在想想，我也浪费了这个机会，以致于后来再转场后由于没有夜店的暧昧气氛很难推进关系。&lt;/p&gt;
+
+&lt;p&gt;一直到凌晨4、5点钟的时候，本故事的女主角终于出现了。她身材娇小，相貌可爱，她和她的朋友被三、四个男生拉到我们旁边的卡座，因为以前就认识她的朋友，我就起身跟她们打了个招呼，刚才这几个男生跟她俩聊天的时候我无意中听说这个娇小的女生（以下简称W，故事的女主角）和我是老乡，就和她多聊了2句，无非是老乡认老乡的客套话，我这边还有mm就没多聊。&lt;/p&gt;
+
+&lt;p&gt;在和目标聊天过程中，我发现她看我的眼神，似乎跟别人不一样，说不出来的感觉，有种死死盯住我的感觉，但又不是那种凶狠的盯，我语文不好啊，不知道怎么形容，这种感觉让我一直回味。&lt;/p&gt;
+
+&lt;p&gt;过了一会儿 一只小手从隔壁卡座伸过来 拨了一下我的头发 我回头一看 原来是她  她说 “我们6点走 你呢？”  我说再待一会儿  半小时之后  她又问我了一遍   我不清楚这是怎么回事  他们那边卡座的男生似乎不是泡学的 喝了有点多 有点粗鲁 又没有跟拉来的妹好好互动  我不知道她重复问我两遍什么时候走是什么意思？ 也许是想和我一起吃早饭？不过我还带着个妹  不好再跟她们一起吃饭&lt;/p&gt;
+
+&lt;p&gt;5点多了 PPG打烊了  我拉着妹去吃早餐，又遇到前面见到的两人组，W还跟我打招呼。吃早餐之后和Z的互动挺差的，由于跟本文故事主线无关，就按下不表了，最终结果就是没有TD她。&lt;/p&gt;
+
+&lt;p&gt;周六白天我打电话给查克，我说“昨晚见到了W，她看我的眼神，好像有点什么东西，我说不上来，今晚要是能见到她，就去打个招呼聊聊”&lt;/p&gt;
+
+&lt;h2&gt;第二天 重逢&lt;/h2&gt;
+
+&lt;p&gt;周六的晚上，我又去PPG找答案和查克，当天的状态很好，进场后跟吧台的一个MM聊了会儿天，仅仅是为了热身，没想到她还跟我是校友，后来她转身走开了，也许是我聊的不好，有点干，不过没关系，我只是找人打招呼，然后聊天，打开感觉，去感受，去表达，这只是练习，不要想太多。&lt;/p&gt;
+
+&lt;p&gt;跟着答案和查克练习夜店已经有一个月时间了，有时候我有点厌倦上上下下寻找目标的感觉了，为什么我会用“厌倦”这个词呢？为什么我不是非常享受地状态呢？我开始感受到answer说的意思了，我们是来玩的，来享受生活，把妹不应该成为我们的心理负担，也不是什么罪恶的事。 这一天，不管是上楼还是下楼，我都不那么急匆匆的了，在楼下也尽量多待一会儿，慢慢的观察周围的人和物，寻找可搭的目标。当我开始打开心，去感受周围的人时，开始觉得有意思了，哪些是熟面孔，哪些是生面孔，哪些人寂寞，哪些人等待被搭讪，旁边的哥们去搭讪是怎样失败的。。。 我也是新手，没什么经验，answer说要打开自己的心去感受。。。&lt;/p&gt;
+
+&lt;p&gt;说一下我对PPG内部地理环境的观察，我觉得PPG里最适合搭讪的地方是楼下楼梯口、吧台、吧台旁边空调这个三角区域，一是因为远离舞池，相对来说没那么吵没那么挤；二是这里更便于观察，有新MM下来可以很快发现，空调附近的区域视野很广。&lt;/p&gt;
+
+&lt;p&gt;我在楼下的时候，发现吧台有个二人组，一个在跟老外聊天，另一个面对吧台，低着头喝东西，貌似有点无聊，这个MM身材苗条大概有一米七，穿着有点OL风，在PPG比较少见，中长发。我给自己鼓了鼓劲，告诉自己，这个姑娘现在有点寂寞，去打个招呼吧，也算做件善事，于是趁着她旁边有空档，就走过去，在她耳边说了声“嗨”，然后身体靠回来，不再向她倾斜，也好让她看清楚我，我也正好看清楚她，面容还是很清秀的，五官小巧精致，7分以上。&lt;/p&gt;
+
+&lt;p&gt;她看看我，有点吃惊，不过没有表现出对我的讨厌，我再凑近她耳边说“我觉得你很有气质，就过来跟你打个招呼”  她不好意思地笑笑&lt;/p&gt;
+
+&lt;p&gt;我说“来这里的女生大多是90后，看你的打扮，这么OL，应该不是90后吧”&lt;br&gt;
+她说“我不是”&lt;/p&gt;
+
+&lt;p&gt;后面我就邀请她和她的朋友去我们的卡座坐会儿，不过她说她们刚过来，想在下面待会儿，我就随便跟她聊了几句，其实舞池旁边的吧台还是有点吵，不适合长时间聊天，最好能移动到卡座。&lt;/p&gt;
+
+&lt;p&gt;当晚我还开了几个组合，效果并不是很理想，不过这已经比我之前的情况好多了，还需要多多练习。12点半过后，我们卡座上有一段时间没女生了，这时候查克说，赶快拉妹，先不管分数了，我和答案的两个学员马力全开冲下楼，这一次，我又见到了W，我从侧面认出了她，她朋友就在附近东张西望，这是典型的有需求感、渴望被带走的表现，而W稍微淡定点，但并没有享受当前环境的感觉，我走过去跟她打个招呼&lt;/p&gt;
+
+&lt;p&gt;“hi，刚才只见到你两个朋友，我还以为你不来了... 我和朋友在上面，一会儿上去坐坐吧” 因为她当时的位置离舞池很近，我假设她还要继续跳舞，就没有强拉她上去，说了这句话以后我就退回到吧台附近了，在后面看着周围的情况，看看还有没有可搭的目标，这时，我发现她在向后看，想在找什么，莫非是在找我？ 算了，不找其他目标了，这个还挺可爱，在这里算不错的了。于是我又走过去对她说，“我要上去了，一起上去吧” 然后轻轻搂她的肩膀往楼梯走，穿过人群后我就松开手了，上楼梯前她定住了一下，我也不知道是不是因为我没去主动拉她，还是她在想自己是怎么从舞池那边过来的，这对我来说也是个迷。&lt;/p&gt;
+
+&lt;p&gt;上楼之后我轻轻搂住她的肩往卡座带。帮她拿了个干净杯子倒上酒，我们开始聊天，她问我的第一个问题就是“你女朋友呢？”  我说昨天那个不是我女朋友 只是关系比较好的朋友&lt;/p&gt;
+
+&lt;p&gt;我发现当我我给她倒酒，或者做其他事没看着她的时候，感觉她在看我，当我去看她的时候，她马上把头偏到一边，这样聊天稍微有点费劲了，我说你这人这么这样呢，说话的时候都不看着我，有点不尊重人啊，你是我见过的第二个对我这样的女生。她的回答让我大吃一惊，她说”我有点不好意思...” 靠！其实第一个对我这样的女生，多年之后也是这样解释的，只是我当年太傻，没看出来。&lt;/p&gt;
+
+&lt;p&gt;我说”怎么不好意思呢？我又不会吃了你”&lt;br&gt;
+她说“你太优秀了，我好像找不出你的缺点。。。你真的好温柔”&lt;/p&gt;
+
+&lt;p&gt;然后我又说了些自恋的话逗她笑，后来我们离离散散聊了几个话题，说说自己的工作，对北京的感受，具体的记不清了，只记得在聊天的空档，她会主动要求喝酒，我和她最初并排坐着，后来我的手放到她的腿上，再后来我搂着她的肩，抱着她的头，抚摸她的头发，让她的头往我这边靠。在这过程中，我收到查克的短信，&amp;quot;升高，k-close&amp;quot;，不过我一直找不到时机，当我和她聊到我们彼此的感情经历后，两人都陷入了沉默，为了打破僵局，我用手托起她的下巴，轻轻的吻了过去，湿吻，稍微伸了下舌头。。。然后松开她，看着她的眼睛，她有些惊讶，说没想到我会这样做。。。&lt;/p&gt;
+
+&lt;p&gt;过了一会儿查克回来了，我说有点饿，问W饿不饿，一起去吃点东西，这不光是为了转场，还是为了给查克留点空间，她的目标跟我的目标是一起的，不能让她们见到。&lt;/p&gt;
+
+&lt;p&gt;我和目标转移到KFC，在安静的环境下继续聊天、喂她吃薯条，说起一会儿去哪儿，她说一会儿还回PPG，她跟朋友一起来的，我说我看看朋友走没，要是走了我就撤。我不知道怎样提出KF，吃完东西我送她回PPG了，后来查克帮我分析，这时候千万不要回去，因为她可能遇到她朋友，那时候再想把隔离开就难了。还好我们回卡座的时候她的朋友不在我们卡座上，我和她坐了一会儿，查克来了，跟我说“你们怎么又回来了，赶紧走，别让她朋友看见”。&lt;/p&gt;
+
+&lt;p&gt;然后我收拾包准备走，还没想到怎么跟W说，她先开口了
+“你要走了啊，舍不得你走”
+我说“我也舍不得你啊”
+“那怎么办”
+“跟我一起回家吧”
+“好！”&lt;/p&gt;
+
+&lt;p&gt;原来，就这么简单。&lt;/p&gt;
+
+&lt;h2&gt;第三天 爱情万岁&lt;/h2&gt;
+
+&lt;p&gt;在回去的车上 我就哼起五月天的《爱情万岁》，其实这是首少儿不宜的歌&lt;/p&gt;
+
+&lt;p&gt;我这里说两个细节：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;她到了我家，我给她打了盆洗脚水，她说，今天我好开心啊，还没有人能让我笑那么久，而且还从没有人给我打过洗脚水&lt;/li&gt;
+&lt;li&gt;第二天醒来，我和她相拥着，我轻轻起床，出门帮她买了牙刷牙膏和毛巾，还有早餐&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;我要说的是，我这么做并不是为了讨好她，而是自己想这么做，基于对她的尊重，对她的喜爱，就算我们只有一晚的缘分，那也要好好在一起。&lt;/p&gt;
+
+&lt;p&gt;吃过早餐后，本来她都已经穿好衣服要走了，我说再坐一会儿吧，就在沙发上靠着说话，恋恋不舍，后来。。。 我们又缠绵了两次，一直到中午。&lt;/p&gt;
+
+&lt;p&gt;温存时，她说“当我第一眼见到你的时候，我就告诉自己，这个男人，我一定要得到。”&lt;br&gt;
+我说，原来当时你的眼神是这个意思，我看出来了，哈哈。她害羞地把脸埋在我怀里。&lt;/p&gt;
+
+&lt;p&gt;更多精彩内容请看蓝色答案的微薄http://weibo.com/answerPUA 欢迎加入北京pickup群  123657731  我们共同进步&lt;/p&gt;
+
+&lt;p&gt;想加入PUA成长计划的兄弟，可以咨询蓝色答案助理Dave QQ:274597195。蓝色答案方法QQ群：175910191&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>搭讪之后蓝色答案现场指导后续短信互动</title>
+   <link href="http://tuohuang.info/pickup-in-sanlitun"/>
+   <updated>2012-07-30T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/pickup-in-sanlitun</id>
+   <content type="html">&lt;p&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;Hi，大家好，我是Allen，是蓝色答案线下课程的学员，刚刚结束三天两夜的培训，虽然现在还是个PUB（Pick Up Beginner，泡学菜鸟），但我和另外两名学员——大鲍、&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;#444444&quot;&gt;&lt;font&gt;&lt;font face=&quot;Tahoma&quot;&gt;&lt;font style=&quot;font-size:14px&quot;&gt;Mango&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;一样，都感觉很有收获。&lt;br&gt;
+&lt;br&gt;
+我说说昨天在三里屯Village搭讪的情况吧。当时答案看到一个身材高挑穿着长裙戴着墨镜的mm，让我去搭，我开始找借口，说她太高了气场很足的样子，还戴个墨镜，看不清脸。。。答案一直鼓励我，我就硬着头皮跟过去了。跟得还挺远，穿过Village的喷泉广场，她向人烟稀少的小巷子走去，中间我又几次想退却，真的，放弃只是一念之间的事。当时我看到路边还有俩PUB摸样的人，望着她的背影，不敢上去搭，好吧，那我还是要继续，继续跟，看她走向那个楼外的电梯，我又犹豫了一下，都已经转身要走了，又转回来走向那个MM，能不能走向目标，有时真的是一念之间。这时电梯正好开了，我和她一起进了电梯，我开始讲开场白&lt;/font&gt;&lt;br&gt;
+&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Blue&quot;&gt;我：Hi，你好，我和朋友在附近逛街，看到你，觉得你很有气质，想认识一下你&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;这是答案的经典开场白，直接表明来意。&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Red&quot;&gt;mm：&lt;font color=&quot;Black&quot;&gt;（有点吃惊，然后笑着回答我）&lt;/font&gt;你好&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Blue&quot;&gt;我：你是住在附近还是来逛街的？&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Red&quot;&gt;mm：我也是来逛街的，跟朋友约在这里吃饭。。。你和朋友一起来的？&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;这时电梯门开了，外面是个餐厅，我看不好再聊，就迅速结尾要号&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Blue&quot;&gt;我：今天有些匆促，我们留个联系方式，等方便的时候再好好聊聊吧&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Red&quot;&gt;mm：好 ：）&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;后面就是报号码了，没想到对方一点都没犹豫。&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;&lt;br&gt;
+&lt;br&gt;
+&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;道别之后我就去找答案了，路上心情很愉悦，因为我没想到她的反应会这么好。过了一会儿，我想起来还没告诉目标我的号码，就跟她发了条短信，是这样的&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;：&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Blue&quot;&gt;我：Hi，我是Allen。很高兴认识你&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;当时&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;我&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;觉得对方回应那么好，应该礼貌点，告诉她我的号码，其实也不期待她会回复。过了几分钟，她回复了：&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Red&quot;&gt;mm： 认识你我也很开心！刚才你在哪里看到我得？你打招呼的时候我很惊讶&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;我问答案应该怎么回，他决定现场教学。他说MM反应很好，Allen你觉得应该怎么回。我说打算描述一下看到她时是什么感觉，又是怎么带点紧张地去跟她打招呼。答案说，这样不好，现在你们已经认识了，已经是朋友了，聊天应该是朋友框架，不要回到当时的情境。&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;应该先描述自己的状态，然后聊点别的，朋友之间聊什么呢？&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;聊点爱好什么的&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;。改了两三遍，最后是这样回的：&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Blue&quot;&gt;我：我刚跟朋友汇合，现在在聊天。你平时周末喜欢做什么呢？&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;后面半句记不清了，大概是这样。然后答案继续讲怎么发短信，没过几分钟，MM回复了&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Red&quot;&gt;mm：恩！我几乎都是宅在家！还有就是和姐妹们逛逛街吃吃饭什么的！你呢都喜欢做什么？&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Black&quot;&gt;这条短信真是让我喜出望外，MM不但回复了我的问题，而且还继续问我喜欢做什么，还有就是，她用了三个感叹号加一个问号。答案继续分析，我没急着回复，结果她马上补了一条&lt;/font&gt;&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Red&quot;&gt;mm：你可以先跟你的朋友们聊！不要打扰到你们！我们有时间再聊！&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;这更说明她比较在意我，是个很大的IOI。再来说前面一条短信。答案说这条短信表明她是向我打开的，&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;问我能从里面感觉出什么。&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;我想了想，真的不太明白，其实感受对方对我来说是件很难的事。&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;答案说，这说明她&lt;strong&gt;寂寞&lt;/strong&gt;。我们三个才恍然大悟。&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;答案问我该怎么回，答案总是这样，不直接告诉我们答案，而是引导我们自己找出答案。我说，我会告诉她我的一些业余爱好，周末如果不加班的话，我会打打球，有时候跳跳舞玩玩桌游。&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;答案说，我们发短信，要有目的，不能为了回短信而回短信，&lt;u&gt;宁可不回短信，也不能无聊&lt;/u&gt;。目标向我表达出自己的感受了，那么我也应该回应感受，他建议这么回：&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Blue&quot;&gt;我： 平时工作挺忙，周末约朋友喝喝东西小聚一下，挺平淡的&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;最后一句“挺平淡的”是点睛之笔，前面也不需要多讲，看不出我在用力，轻描淡写一带而过。&lt;/font&gt;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;没想到效果出奇地好：&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Red&quot;&gt;mm：呵呵！一样得！最近我不怎么忙所以想出去旅游！但不知道去哪儿正纠结呢&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;不但引起了MM的共鸣，而且她还引出了话题，表达了纠结之情。那我该怎么回复呢。答案说，&lt;u&gt;不要为了回短信了而回短信&lt;/u&gt;，我们的目的还是为了以后能邀约，推进关系，&lt;u&gt;重点不是说什么 而是捕捉到她的状态&lt;/u&gt; 如果不想聊这个话题，就不要聊。我也觉得短信里聊旅游不能聊出什么来，而且，她只是在表达感受，并不是问我建议，像她这样的富家女，玩过的地方比我多多了，我还能提供什么建议给她呢。答案说，她说的是旅游 其实她是在跟我分享心情。他建议试着约今晚见面：&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Blue&quot;&gt;我： 你们今天几点结束？我九点就自由了，我知道三里屯有个地方环境特别好，我们去喝点东西聊聊天吧&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;短信发出去以后，有很长时间没回复，大概有半个多小时吧，当时跟他们聊得很起劲，感觉不到时间过得那么快，我们还看了看三里屯某个在屋顶的露天酒吧，环境是挺不错的。我们四个在夕阳下合影留念，结束了全部的课程，跟答案分别之后，我收到了MM的回复：&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Red&quot;&gt;mm：我不知道呢！晚点去酒吧应该！&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;我觉得不用继续追问了，不是很确定，就把mm的短信转发给答案了，答案说下次再约&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;font color=&quot;Blue&quot;&gt;我：行，那下次再约吧&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&amp;nbsp;&amp;nbsp;&lt;/font&gt;&lt;font face=&quot;楷体,楷体_GB2312&quot;&gt;&lt;font size=&quot;4&quot;&gt;刚刚答案在群里说，下次再约，她会有补偿心理 出来的可能会更大&lt;/font&gt;&lt;/font&gt;&lt;font size=&quot;4&quot;&gt;&lt;br&gt;
+&lt;br&gt;
+更多内容在蓝色答案的&lt;a href=&quot;http://weibo.com/answerpua&quot;&gt;微博&lt;/a&gt;&amp;nbsp;&amp;nbsp;以及&lt;a href=&quot;/&quot;&gt;我的博客&lt;/a&gt;&lt;br&gt;
+欢迎加入北京pickup群&amp;nbsp;&amp;nbsp;123657731&amp;nbsp;&amp;nbsp;我们共同进步&lt;br&gt;
+&lt;br&gt;
+&lt;/font&gt;&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>寒冰如是说</title>
+   <link href="http://tuohuang.info/talk-with-hanbin"/>
+   <updated>2012-05-23T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/talk-with-hanbin</id>
+   <content type="html">&lt;ul&gt;
+&lt;li&gt;遭遇对方LMR时的说辞&lt;/li&gt;
+&lt;li&gt;夜店女郎纹身的段子：两个小时之后，我什么都看见了&lt;/li&gt;
+&lt;li&gt;关于“大男子主义”：实图去改变对方，让对方按照自己的想法去做&lt;/li&gt;
+&lt;li&gt;关于长期关系，接受对方本来的样子，性格上的缺点&lt;/li&gt;
+&lt;li&gt;朋友把你介绍给MM，第一句话怎么说？“我觉得你很可爱”“我觉得你的声音。。。”要比“认识你很高兴”更出彩&lt;/li&gt;
+&lt;li&gt;搭讪的开场白，“你好，我只有一点点时间，&lt;strong&gt;我觉得&lt;/strong&gt;我很想认识你，我想我要是不过来的话会有一点点遗憾。。。”&lt;/li&gt;
+&lt;li&gt;舒适感阶段讲故事，向对方打开心门，暴露自己的敏感面、阴暗面。&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>弄掉你的小肚子zz</title>
+   <link href="http://tuohuang.info/get-fitness"/>
+   <updated>2012-05-22T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/get-fitness</id>
+   <content type="html">&lt;p&gt;转自人人分享&lt;/p&gt;
+
+&lt;p&gt;挑一个!做十分钟!两个星期内就会见效!  &lt;/p&gt;
+
+&lt;p&gt;如果是第一次做的人!建议先做二十下!再看个人状况!逐日增加!&lt;/p&gt;
+
+&lt;p&gt;不要太勉强!但一定要持之以恒!加油吧！！！&lt;/p&gt;
+
+&lt;p&gt;1.美化腰部、消除赘肉 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/fitness/1.gif&quot; alt=&quot;&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;2.强化腹肌及腰背的肌腱 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/fitness/2.gif&quot; alt=&quot;&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;3.左右两边伸展运动 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/fitness/3.gif&quot; alt=&quot;&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;4.美化背部线条，预防颈椎病 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/fitness/4.gif&quot; alt=&quot;&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;5.手脚并用可以让身体左右均衡 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/fitness/5.gif&quot; alt=&quot;&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;6.同时增加手部柔软度 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/fitness/6.gif&quot; alt=&quot;&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;7.收紧腹部肌肉 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/fitness/7.gif&quot; alt=&quot;&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;8.减去小肚腩 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/fitness/8.gif&quot; alt=&quot;&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;9.增加脚部柔软度结实臂部 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/fitness/9.gif&quot; alt=&quot;&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;10.消除臀部下垂的赘肉和紧实腿部肌肉 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/fitness/10.gif&quot; alt=&quot;&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;11.消除臀部下垂的赘肉和紧实腿部肌肉2 &lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/images/fitness/11.gif&quot; alt=&quot;&quot;&gt;
+&lt;/p&gt;
+
+&lt;p&gt;另外还有个&lt;a href=&quot;http://www.tudou.com/programs/view/GiMryRoT_T0/?resourceId=0_06_02_99?fr=2&quot;&gt;视频教程&lt;/a&gt;&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>关于暧昧的一个真实案例</title>
+   <link href="http://tuohuang.info/neg-and-comfort"/>
+   <updated>2012-05-10T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/neg-and-comfort</id>
+   <content type="html">&lt;p&gt;下面是在学校BBS上看到的&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;最近去签的工作单位实习，带我的师傅是人大的直系师兄，业务素质很高，才华横溢。我在学校是逍遥派弟子，说话做事过于直爽没个谱，鉴于职业需要，师兄对我严格管教。
+可是，我越来越觉得他对我管教范围过于宽广了，从着装仪态、言谈举止到恋爱技巧生活常识，甚至于女性保健知识……&lt;/p&gt;
+
+&lt;p&gt;这些都让我觉得十分不自在。更那啥的是，他基本上每天都要打击我，比如长得丑、胳膊粗之类的。我对他尊敬，他说我死板；我跟他开开玩笑，他说我没大没小；我穿的正统点，他说我像欧巴桑；我穿的时尚点，他说我像站街女。而且，他说我像站街女已经不止一次了。但那些衣服我让朋友看，她们都觉得很正。&lt;/p&gt;
+
+&lt;p&gt;我实在是搞不懂这个师兄到底在想什么，我脸皮再厚也扛不住每天被打击。但他确实又对我非常好，对工作生活又很关心，经常短信QQ聊天，还在适当的时候送过花和香水。但我后来发现，他对每个实习生或者女同事都很好，也送过她们香水之类的。&lt;/p&gt;
+
+&lt;p&gt;我自己是狮子座的，直来直去，即使心思细腻也不敢自作多情轻易表露。那师兄是双鱼座的，整天不知道在想啥。我问朋友，她们说他就是个孩子，借打击我来引起注意。可是他都快30岁了诶，又表现的对女人很了解。实在不知道他在想什么。&lt;/p&gt;
+
+&lt;p&gt;而关键是，我每天满脑子都是他。也不知道是因为每天满脑子想的都是工作，顺带想他，还是真的对人家有非分之想。啊，怎么办啊~~~&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;能从这个女生的帖子里看出什么呢？打压+关心，推拉战术，暧昧。。。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>五月五日武汉之旅的自我剖析</title>
+   <link href="http://tuohuang.info/mayday"/>
+   <updated>2012-05-06T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/mayday</id>
+   <content type="html">&lt;p&gt;此次武汉之行，即是28岁生日之前的疯狂之举，也是我的心灵之旅，让认识到自己的局限。&lt;/p&gt;
+
+&lt;h2&gt;1. 做事不坚决&lt;/h2&gt;
+
+&lt;p&gt;周六那天和表妹来到体育场，票贩子打电话过来说之前说好的355的票已经没有了，只有255的票卖355，或者555的票卖600，都不能保证是真的。我当时在犹豫，一是觉得不靠谱，二是觉得要出的钱太多。其实第一条可以小心地规避，第二条最闹心了。我都已经来了，付出了路费住宿费和时间，去体育场之前我还跟表妹说，不要做个纠结犹豫的人，钱乃身外之物，自己开心快乐最好。后一个原因是听信了传言，说开场以后票价会降。但是这实在是条坑爹的谣言啊，开场以后场外还是有好多歌迷和票贩子，票贩子见这阵势也还是不降价，我怀疑另一个解释就是，他们手里的票根本就是假的，所以卖不卖得出去都无所谓了。&lt;/p&gt;
+
+&lt;h2&gt;2. 担当感不强&lt;/h2&gt;
+
+&lt;p&gt;说实话，周日我上了火车之后就有点后悔了，你说我不辞辛劳来趟武汉为什么呢？回来的火车非常的不爽！！不就是想和表妹一起看演唱会吗？之前和表妹在中山公园聊了很久，都聊到了各自的感情问题，为什么不继续给她留下一个梦幻的演唱会的体验。&lt;/p&gt;
+
+&lt;p&gt;在我穿梭于歌迷和票贩子寻找靠谱的价钱合适的门票时，她怎么想的，我体会到了吗？她反复说“你买张内场票进去吧，我就不去了”这时候我居然说，你不去我也不去。现在想想，我这么说真是操蛋啊，这么说的意思是，我要是看不了的话就是因为你不去，这明显是把责任推卸给她了。我当时真是二逼了，用我们武汉话说就是苕，真特么不爷们。她之前赶到我的住处的时候就已经在车上站了2个小时，然后我们在场外徘徊的时候又那么累，从5点多一直到9点，我们都是在外面站着。我感觉时间过得很快，但是她又如何想呢？&lt;/p&gt;
+
+&lt;h2&gt;3. 未来的方向&lt;/h2&gt;
+
+&lt;p&gt;对于自己坚持的事，自己喜欢的人，钱真的不是什么大的制约，以后一定要收敛一下这种屌丝心态，并且，一定要去掉这种心态。我只在这里写出来，所有的负面心理，都只在这个隐蔽的空间里写出来。但是我知道，我写出来的目的是要警示自己，不要再留在自己的舒适区域里，要勇敢去面对各种选择带来的风险，衡量它们的长期效用。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>舒适感的心态</title>
+   <link href="http://tuohuang.info/comfortable-feeling"/>
+   <updated>2012-05-04T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/comfortable-feeling</id>
+   <content type="html">&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;无所求&lt;/strong&gt;。不是看中别人身上的什么东西才接近别人，比如看中别人的钱财、地位、美色。当你对别人有所图，别人就会防备你，想躲开你。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;自然&lt;/strong&gt;。既不刻意热情，也不刻意冷淡。说该说的话，做该做的事。看起来正正常常，不让人觉得古怪。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;真诚&lt;/strong&gt;。不装腔作势，不藏着掖着，心里的东西都拿到桌子上来讲，不掩盖自己的欲望，不害怕暴露自己的不安全感。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;礼貌&lt;/strong&gt;。并非虚情假意的客气客套，发自内心的理解尊重他人。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;随和&lt;/strong&gt;。客随主便，主随客便。尊重、理解与接受对方与自己的不同，不起冲突，满心喜悦地随顺对方的意愿。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;爱&lt;/strong&gt;。真心希望对方快乐，真心帮助对方。但也不要莫名的热情，自然而然地去帮助对方，不要随便就牺牲自己的利益去帮助对方，那样会让对方有压力。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;倾听&lt;/strong&gt;。用无限的耐心去听对方表达，不去评价对方的观点、情感，完全接受对方所有的感受。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;看了以上几点，希望你不要误解我是告诉你做一个老好人，不是这个意思。随和与个性是不矛盾的，你可以在以上的几点原则下最大限度的表达你的个性。你既是很有个性的，又是很容易相处的。个性而随和，你就会成为一个最受欢迎的人。要做到这些，需要你持久地学习、成长，了解自己、修炼内心。&lt;/p&gt;
+
+&lt;p&gt;出自&lt;strong&gt;寒江雪的邮件列表&lt;/strong&gt;。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>十三种不自信的行为</title>
+   <link href="http://tuohuang.info/unconfidence-behaviour"/>
+   <updated>2012-05-03T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/unconfidence-behaviour</id>
+   <content type="html">&lt;p&gt;本文节选自成真的《迷上我》。&lt;/p&gt;
+
+&lt;p&gt;下面13个行为，会在潜沟通中，告诉女人你不自信。你只要去掉这些行为，你就能比原来显得更加自信起码5倍。而且你立刻就能去掉这些行为。 &lt;/p&gt;
+
+&lt;h2&gt;1. 坐立不安，烦躁紧张产生的小动作&lt;/h2&gt;
+
+&lt;p&gt;讲话时，没事一会儿摸一下自己鼻子，摸一下自己脸，或者双手不知道往身体哪里放，一会儿放在口袋，一会儿拿出来，东摸自己一下，西摸自己一下。或者抓抓头，挠挠背等等一系列习惯性小毛病小动作全部去掉。因为你自己可能看不到，别人很容易看到这些动作，很容易传递自己很紧张的讯号。和女人讲话为什么要放松，而紧张为什么不好，就不用我讲了。我有过一个学生，其他都不错，就有个频繁眨眼睛的毛病，学了和泡了好久，都没什么满意的结果。后来，我花了2天的时间帮助他去掉这个讲话频繁眨眼睛的毛病后，之后的第三天他就上了一个美女的床。&lt;/p&gt;
+
+&lt;h2&gt;2. 肩膀绷得太紧。缺乏笑容&lt;/h2&gt;
+
+&lt;p&gt;和女人讲话太过严肃，像国家大事谈判一样或者假装&amp;quot;深沉&amp;quot;。这是男人对自己缺乏信任的怕别人不把他当回事的时候的过头的反面表现。或者说是心虚的表现。几乎每个女人都很容易察觉出男人各种心虚。&lt;/p&gt;
+
+&lt;h2&gt;3. 讲话太快&lt;/h2&gt;
+
+&lt;p&gt;讲话太快表明担心别人会打断你讲话，或者担心别人马上就会失去兴趣听你讲，但是你又要别人听到你讲的话，想把一些有趣的东西讲出来，这样在他们失去兴趣之前你就可以保住他们的兴趣，所以想最短时间内讲完。这是非常不自信的表现。&lt;/p&gt;
+
+&lt;h2&gt;4. 习惯性口头语&lt;/h2&gt;
+
+&lt;p&gt;类似，&amp;quot;对不对？&amp;quot;，&amp;quot;你知道吗？&amp;quot;等等。我高中做演讲的时候有一次讲了30分钟，一共说了47次&amp;quot;对不对&amp;quot;，你猜猜，是谁第一个提醒我的？对了，一个女人。因为女人特别注意这种东西。这些口头语是在寻求他人的认可，像是要别人在你说话的时候，不停的说&amp;quot;你说得对&amp;quot;，&amp;quot;有道理&amp;quot;等等。&lt;/p&gt;
+
+&lt;h2&gt;5. 讲话太轻柔或者太吵闹&lt;/h2&gt;
+
+&lt;p&gt;太轻柔，传递给女人的讯息是你害怕侵犯到别人的个人空间。换句话说，你不够男人。太吵闹，一则是传递不够成熟，二则是害怕别人知道你不够男人，故意大声，但是没有掌握好度，也是过头的反面表现。&lt;/p&gt;
+
+&lt;h2&gt;6. 自己笑自己&lt;/h2&gt;
+
+&lt;p&gt;自己讲了一个笑话，然后自己就开始笑。或者自己讲话讲到一般就没事傻笑自己的话。或者别人问你话，你不知道怎么回答，只好傻笑等等。这个表明你无法承受社交压力，讲了笑话怕别人不笑，怕冷场，自己来填补。你可以试试看，没有任何表情非常自信的看着对方。&lt;/p&gt;
+
+&lt;h2&gt;7. 回答别人问题回答的过早或者太快&lt;/h2&gt;
+
+&lt;p&gt;表明你对这个谈话太看重，对这个说话的对象（我假定是女的，除非你是同志）表现出过早过多的兴趣。&lt;/p&gt;
+
+&lt;h2&gt;8. 第一时间回到之前在谈论但是后来被打断的话题&lt;/h2&gt;
+
+&lt;p&gt;这个行为表明很费劲想赢得别人的认可。当你要讲的一个话题被打断，可能是对方接电话，突然问你一个问题，或者是突然遇到一个熟人等等，你抓住第一个可以插话的空间，开始继续你刚才要讲的话题，这样看上去你一直在等这个机会回到这个话题。为什么你这么急要回到那个话题呢？因为要寻求他人的认可，你以为她如果听了你要讲的话会给你认可或者认为你很棒。所以，不要急，等到她说&amp;quot;你刚才讲到那个。。。。。。&amp;quot;的时候，在回到前面的那段话题。如果，对方没有提起，那就不要再讲那个话题了，即使你认为那个话题很好，很值得讲，或者有些人是前天晚上辛辛苦苦准备的话题，都不要讲了。别人不提，表明她其实不感兴趣。&lt;/p&gt;
+
+&lt;h2&gt;9. 太急着显示自己的兴趣&lt;/h2&gt;
+
+&lt;p&gt;比如在进入互相了解和熟悉之前，每次没听清楚她说什么，就急着问&amp;quot;你说什么？&amp;quot;同样道理，过早显示太多兴趣了。如果没听清，就转换话题。切断她讲的话。还可以直接用男人底气十足的语气开玩笑地说，&amp;quot;你刚才说的我一个字都没听清楚（看着她，沉默几秒钟）。。。。。但是，你刚才讲话的样子很可爱。&amp;quot;加上坏笑，整个时候你都深深地看着她的眼睛，同时记住讲话要稳，要慢。你自己吐字发音要清楚。不要你说你听不清她讲的，到后来她也听不清你讲的。两个人表演相声可以这么干。&lt;/p&gt;
+
+&lt;p&gt;但是要泡妞不行。&lt;/p&gt;
+
+&lt;h2&gt;10. 对她的问题的回答过于完美完整&lt;/h2&gt;
+
+&lt;p&gt;问题回答的逻辑过于严密，感觉是你花了很多心思思考后得出的很好的答案。你会问，我的答案很严密完整有什么不好？仔细想想，什么时候你要这么回答严密完整？从小时候起，在学校向老师报告，回答老师上课提出的问题要完整，严密。属下向老板报告要完整严密。工作面试回答面试官的问题要完整严密，不能东讲一句，西撤一段。注意到他们的共同点了吗？对了，他们当时的社交价值比你高，你需要他们对你的认可，给你工作，给你成绩，给你工资等等。也就是说，当你回答过于完整严密，表明你回答的这个人地位比你高。女人被比自己社交地位高的男人吸引。所以这样的回答，对你吸引女人不利。从内心的角度，回答的过于完整和严密说明你觉得自己只有很努力思考好的回答来说服她，赢得她的认可，自己才会被她接受。 &lt;/p&gt;
+
+&lt;p&gt;比方说，女人问你：&amp;quot;你为什么问我这个男人撒谎多还是女人撒谎多的问题？&amp;quot;错误回答：&amp;quot;因为我对这个问题已经思考了很久，我真的需要知道你的看法。&amp;quot; &lt;/p&gt;
+
+&lt;p&gt;正确回答1：&amp;quot;我还没说完。&amp;quot;&lt;br&gt;
+（然后继续说，甚至可以转换话题）&lt;/p&gt;
+
+&lt;p&gt;正确回答2：&amp;quot;因为我想和你搭讪。&amp;quot;&lt;br&gt;
+（诚实野人法，只适用于女人单独的时候）&lt;/p&gt;
+
+&lt;p&gt;正确回答3：&amp;quot;我觉得你刚才问我问题的样子很可爱。&amp;quot;&lt;br&gt;
+（用冷读岔开话题，夺回控制权） &lt;/p&gt;
+
+&lt;h2&gt;11. 太啰嗦&lt;/h2&gt;
+
+&lt;p&gt;屁话太多。用太多的话讲一个可以用很少话讲清楚地事情。对于这一点，我在写这些文章自己也觉得写的很啰嗦，严重犯有这个毛病。看完就知道我为什么要犯这个毛病。男人对女人讲话太啰嗦很多都是因为他们怕女人不能完全理解他们的意思。这其实也是一个太在意女人的问题，他们太在乎眼前的这一个女人。一开始对女人讲话，用越少的话讲一个事情就会越显得深奥，迷人。很讽刺，我写这些东西啰嗦是因为我怕别人不理解我说的，在实战中误用了我的理论。另外，我觉得我的确很在乎学习这个吸引学的男人，希望你们都能吸引到自己喜欢的女人，获得很多快乐。因为我以前也和你一样。我知道只要努力学好，这都会改进，恋爱不再有苦恼，梦想会实现！我的梦想是中国男人不再为恋爱费神，你可以把精力放到其他自己事业目标上去。&lt;/p&gt;
+
+&lt;h2&gt;12.  对以前她说的话记得太牢&lt;/h2&gt;
+
+&lt;p&gt;这个意味着，她对你有太多太多的社交价值，比如说你从来没有和这么性感迷人的女人约会过等等，或者你已经爱上她了。当然，我不是说对她的话都无所谓。只是在一开始她说的话如果你一字一句的记得太牢是不正常的。一个简单的标准是，如果这句话是一个丑女或者一个其他什么刚认识的男人说的，你会不会记得这么牢？如果不会，对这个美女也不要。不过，你和她已经在一个深度亲密的谈话中，两人已经建立很好的信任关系和非常熟悉对方。那么，这就不是问题。否则，你要考虑假装忘记。即使她是什么你泡的第一个电影明星或者模特，也要假装忘记。这个女人社交地位大幅度比你高的极端情况下，你甚至可以忘记这个女人的名字。甚至可以假装不认识她。你可能会情不自禁，但也要知道，然后有意识的控制。&lt;/p&gt;
+
+&lt;h2&gt;13.  过早谈论自己或者倾诉自己心里&lt;/h2&gt;
+
+&lt;p&gt;这个等于，太着急要别人来喜欢你。生怕别人不喜欢你。还是心虚的表现。每个人都有这个倾向，都是要有意识的控制住。 &lt;/p&gt;
+
+&lt;p&gt;（A）口头上：如果你对她说，&amp;quot;我刚从美国回来（或者任何其他你认为有面子的地方）&amp;quot;或者&amp;quot;我刚把我的劳力士表修好了&amp;quot;或者类似&amp;quot;我公司昨天刚刚上市了&amp;quot;等等，女人很容易察觉出你在试图在她面前表现一番。在女人面前表现自己，就自动把自己归到她的追求者一类，而不是她要追求的男人一类。所以，不要太早托盘交出你的简历和成就。让她去日后慢慢发现。即使实在想要表现，你的表现也必须是非常隐秘的，看起来就像因为这个故事有趣你才讲，而不是你为了讲一个故事里面隐藏一个表现自己的信息。即使在任何平常时候讲夸自己优点和做的好的事情，不要讲太多细节，简单带过就可以了。不过，没事儿最好不要讲自己的优点。说实话，除了你爸妈和那个爱上你的妞，没人在乎。&lt;/p&gt;
+
+&lt;p&gt;不对，那个爱上你的妞，如果你整天讲，也会慢慢不爱你。&lt;/p&gt;
+
+&lt;p&gt;（B）娱乐上：如果你有一些娱乐女人的段子伎俩等，比如，你学了几招魔术，看手相，秀照片，和什么谈话小游戏等等，如果你过早的拿出来，也会显得你急于求成，太费心思。我个人来说，我不用任何这些伎俩和段子（当然刚开始的时候用过很多），但我知道很多学习吸引学的人在用。当他们在女人攒够自己对她兴趣之前就拿出来显宝，却显得自己很便宜。这些娱乐段子不急着用，慢慢来。 &lt;/p&gt;
+
+&lt;p&gt;(C) 谈话上：当你不停地对她说话，而她没有任何回话，都是你在说啊说，你就是在降低自己的社交价值。这是一个恶性循环。当你自己说的太多，发觉自己在寻求女人认可，所以就像挽救这个场面而越发说的更多，然后你越来越觉得不对劲，越来越寻求认可。要避免这个的方法就是除非女人给你回话，也就是有反馈，有反应，否则你就不要说太多。在实战中，你可以用休止谈话法和故意制造尴尬沉默法来迫使女人做出反馈，给你回话。当然，你要有一定的心态，不要你自己制造的尴尬沉默，自己挡不住压力，先说话来填补沉默。&lt;/p&gt;
+
+&lt;p&gt;最后，我总是提到“吸引是一种情绪”，是的我总是在我的邮件里、教程里、音频里、见面会中无数次提到它，我已经不记得我到底说过多少次了。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>冷读之后</title>
+   <link href="http://tuohuang.info/after-cold-reading"/>
+   <updated>2012-05-03T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/after-cold-reading</id>
+   <content type="html">&lt;p&gt;如果冷读或猜数字后，女生惊讶的说“你怎么知道？”或“我们刚认识你怎这么了解我”这个时候兄弟们怎么回答？&lt;/p&gt;
+
+&lt;p&gt;你可以说&lt;/p&gt;
+
+&lt;p&gt;“对啊 我们两年前分手的”&lt;/p&gt;
+
+&lt;p&gt;“当然了解，我们分手才一年”&lt;/p&gt;
+
+&lt;p&gt;冷读成功后，女生一般会很惊讶，说完这个提高购买度有点小暖昧的回答后，她们都会大笑。&lt;/p&gt;
+
+&lt;p&gt;接着说：记得那时我们两个养了一只猫和狗，分开的时候狗给你了，猫给我了，你没有欺负她吧，目标基本上都会回答这个问题，这时目标就已经掉入角色扮演了。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>计划</title>
+   <link href="http://tuohuang.info/plans"/>
+   <updated>2012-05-01T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/plans</id>
+   <content type="html">&lt;ol&gt;
+&lt;li&gt;让自己的生活步入正轨。内心充实快乐，这样才能散发阳光&lt;/li&gt;
+&lt;li&gt;表现自己的领导能力，多在人前演讲。&lt;/li&gt;
+&lt;li&gt;多写点东西。锻炼表达能力，理性和感性的都写。&lt;/li&gt;
+&lt;li&gt;好好工作。事业还是很重要的，不是富二代官二代，不努力拿什么和高帅富竞争。&lt;/li&gt;
+&lt;/ol&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>男人追求女人常犯的十大最致命的错误</title>
+   <link href="http://tuohuang.info/ten-mistakes"/>
+   <updated>2012-04-30T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/ten-mistakes</id>
+   <content type="html">&lt;p&gt;以下来自《迷上我》的作者成真，《男人追不到女人的十大原因——以及如何确保避免这些常见错误》&lt;/p&gt;
+
+&lt;h2&gt;错误一：对女人太“好”&lt;/h2&gt;
+
+&lt;p&gt;你有没有发觉，那些有点魅力的女人，似乎从来不会被对她太好的“好男人”所吸引？&lt;/p&gt;
+
+&lt;p&gt;你当然发觉了。 &lt;/p&gt;
+
+&lt;p&gt;就像我一样，我相信你一定有认识的美女喜欢“坏男人”…  但出于某种原因她们对你却没有那种兴趣？ &lt;/p&gt;
+
+&lt;p&gt;这是为什么呢？ &lt;/p&gt;
+
+&lt;p&gt;原因其实很简单… &lt;/p&gt;
+
+&lt;p&gt;女人在最初判断是不是被这个男人吸引时并不看这个男人对她有多“好”。 女人之所以喜欢她们喜欢的男人，是因为：&lt;/p&gt;
+
+&lt;p&gt;她们对这些男人感到一种本能的吸引。 &lt;/p&gt;
+
+&lt;p&gt;你猜怎么样？ &lt;/p&gt;
+
+&lt;p&gt;对女人太好并不能使女人感觉到那种强大的、本能的吸引。 &lt;/p&gt;
+
+&lt;p&gt;而且对女人太好，并不能使她们选择你。当她们找到可以给她这种本能吸引的男人，就会立刻选择他放弃你（离开你）。我知道这似乎并不符合逻辑，也很难让人接受…但你必须接受。 &lt;/p&gt;
+
+&lt;p&gt;并且，只有等到你接受这个事实并开始改变自己，否则你永远不会得到你真正想要的女人。&lt;/p&gt;
+
+&lt;h2&gt;错误2：总是迎合女人的观点&lt;/h2&gt;
+
+&lt;p&gt;绝大多数男人碰到自己喜欢的女人时，总是一味地去赞同、迎合女人的意见。&lt;/p&gt;
+
+&lt;p&gt;他们觉得这样就能赢得女人的心。他们认为，只要赞同她，就会让女人感到舒服，开心。你总是顺着她，她还有什么理由不高兴？&lt;/p&gt;
+
+&lt;p&gt;没错或许她会对你友好，或许你在赞同她观点的时候她会很高兴，但是对她而言，你们的关系就到此为止了，很难跨越普通朋友了。&lt;/p&gt;
+
+&lt;p&gt;其实对女人来说，她们更喜欢那些有自己想法和主见的男人，而不是那些成天只会同意她们的观点和要求的男人。&lt;/p&gt;
+
+&lt;p&gt;没想到吧？&lt;/p&gt;
+
+&lt;p&gt;女人不喜欢自己的男人总是在说“好的”、“对的”这样附和迎合的话。因为在女人看来总是赞同她的男人是没有主见的，软弱的，无能的。 女人对这样的男人是无法产生吸引的。即使在她内心脆弱的时候，想和一个这样没主见的男人试试看，但很快，她就会离开他。这是女人的本能。世界上任何东西无法强求。&lt;/p&gt;
+
+&lt;h2&gt;错误3：向她寻求认可或者请求许可&lt;/h2&gt;
+
+&lt;p&gt;我们错误地以为：讨好女人会让她们喜欢我们。 男人总是想方设法来讨好女人，去获得女人的“认可”或“许可”。&lt;/p&gt;
+
+&lt;p&gt;又是一个糟糕的想法。&lt;/p&gt;
+
+&lt;p&gt;女人从来不会被讨好她们的男人所吸引…永远不会.&lt;/p&gt;
+
+&lt;p&gt;但不要误解我。&lt;/p&gt;
+
+&lt;p&gt;你不用刻意对女人“坏”来吸引她们。&lt;/p&gt;
+
+&lt;p&gt;不过，如果你认为对女人好，意味着“总是去讨好她，寻求她的认可和允许”，你需要再好好想一想。&lt;/p&gt;
+
+&lt;p&gt;讨好女人，获得认可永远不会让女人喜欢上你。 女人其实讨厌寻求她们认可的男人。&lt;/p&gt;
+
+&lt;p&gt;不相信我？就问问任何你身边的女人是不是讨厌那些整天粘在身边寻求她们认可的男人…… &lt;/p&gt;
+
+&lt;h2&gt;错误4：总是试图通过请她吃饭和送她礼物来“买”她对你的喜欢&lt;/h2&gt;
+
+&lt;p&gt;数一下你请女人吃了多少次饭？买礼物送给她？送花给她？但她还是拒绝你而喜欢上另外那个对她不如你一半好的男人? &lt;/p&gt;
+
+&lt;p&gt;如果你和我一样，那么你对这个已经受够了。 &lt;/p&gt;
+
+&lt;p&gt;不过，你猜怎么着? &lt;/p&gt;
+
+&lt;p&gt;这样的结果非常正常...... &lt;/p&gt;
+
+&lt;p&gt;对， 我是说这是正常的。 &lt;/p&gt;
+
+&lt;p&gt;你做这些事情的时候，你其实给出一个非常明显而清楚的信息: &lt;/p&gt;
+
+&lt;p&gt;&amp;quot;我认为你不会因为 ‘我’本身这个人而喜欢我，所以我要竭尽全力收买你对我的关注和对我的喜欢&amp;quot;。&lt;/p&gt;
+
+&lt;p&gt;你善意的意图通常就这样在女人眼里显得你对自己缺乏自信，要靠“贿赂”女人来让她喜欢你，试图通过金钱礼物来控制女人。而“缺乏自信”是最快让女人对你失去感觉的东西。 &lt;/p&gt;
+
+&lt;p&gt;对的，我说的是，在女人眼里用金钱和礼物等企图被看作为“控制”。 甚至有些女人会在内心里瞧不起这样的男人。&lt;/p&gt;
+
+&lt;h2&gt;错误5：过早表白——在交往中过早地向她倾诉你对她的感情/ 感受&lt;/h2&gt;
+
+&lt;p&gt;另一个巨大的，不幸的错误就是大部分男人过早地向女人倾诉自己的“感受”，过早地向女人表白。&lt;/p&gt;
+
+&lt;p&gt;有魅力的女人是稀少的。&lt;/p&gt;
+
+&lt;p&gt;她们通常会被很多男人关注。&lt;/p&gt;
+
+&lt;p&gt;大部分男人并没意识到这点。美女们总是被很多男人喜欢，用各种方式来吸引她的注意。&lt;/p&gt;
+
+&lt;p&gt;一个有魅力的女人一天当中可能就会好几次引起男人的关注，有目光飘视，有嘘寒问暖的，甚至有陌生男人上前搭讪等等。&lt;/p&gt;
+
+&lt;p&gt;一天几次，一个礼拜就是几十次，往往一个月就是几百次。&lt;/p&gt;
+
+&lt;p&gt;猜猜会怎样？&lt;/p&gt;
+
+&lt;p&gt;有魅力的女人通常被很多男人追过，甚至和很多男人交往过，谈过恋爱。 &lt;/p&gt;
+
+&lt;p&gt;对的。她们在感情上有很多经验。&lt;/p&gt;
+
+&lt;p&gt;她们知道你的一言一行意味着什么。&lt;/p&gt;
+
+&lt;p&gt;有件事情能让她马上对你失去兴趣，立刻从你身边离开， &lt;/p&gt;
+
+&lt;p&gt;那就是当一个男人在和她见面一两次后就向她表白： “你知道吗，我其实真的，真的，很喜欢你。”&lt;/p&gt;
+
+&lt;p&gt;这对有魅力的女人来说，等于在告诉她，你和其他没追到她的男人，没什么两样，不能控制自己的感情，已经情不自禁地爱上她了。&lt;/p&gt;
+
+&lt;p&gt;用和别人一样的方法永远不能让你脱颖而出，反而会加快你的失败。 &lt;/p&gt;
+
+&lt;p&gt;所以， 不要这么做。&lt;/p&gt;
+
+&lt;p&gt;好，深呼吸……放轻松。&lt;/p&gt;
+
+&lt;p&gt;其实，有一个更好的办法……&lt;/p&gt;
+
+&lt;h2&gt;错误6：不“理解”女人对男人的爱是怎么产生的&lt;/h2&gt;
+
+&lt;p&gt;在男女吸引的问题上，女人和男人有很大的区别。&lt;/p&gt;
+
+&lt;p&gt;你必需接受这个事实，并且学会正确处理。&lt;/p&gt;
+
+&lt;p&gt;当一个男人看见一个美丽，性感，火辣的女人，他立刻就会感觉到性吸引，甚至有生理反应  (你知道我指的是什么 :)。&lt;/p&gt;
+
+&lt;p&gt;但女人是不是也一样？&lt;/p&gt;
+
+&lt;p&gt;女人感觉到性吸引难道也是通过外表？或者其它因素？&lt;/p&gt;
+
+&lt;p&gt;怎么说呢，通过长达整整8年的学习、研究和实践，我可以明确地告诉你：&lt;/p&gt;
+
+&lt;p&gt;女人通常是由于外表以外的其它因素而对男人产生吸引的。&lt;/p&gt;
+
+&lt;p&gt;对，我说的是外表以外的其它因素。&lt;/p&gt;
+
+&lt;p&gt;你有没有注意到过通常不帅的男人和美女在一起的比率，要比不美的胖女人和帅哥在一起大很多呢？&lt;/p&gt;
+
+&lt;p&gt;想一想，是不是这样。&lt;/p&gt;
+
+&lt;p&gt;比起仅仅看外表，女人更被男人身上的某种特质所吸引……比起外表，更吸引女人的是她们在男人身边时，那个男人给她们的那种特别的“感觉”。&lt;/p&gt;
+
+&lt;p&gt;如果你懂得如何正确运用你的肢体语言和沟通能力，那么你就可以使女人对你感觉到那种强大的性吸引力，&lt;/p&gt;
+
+&lt;p&gt;就和你自己看到漂亮、性感女人时感到的相同的那种“感觉”。&lt;/p&gt;
+
+&lt;p&gt;但是，这不是你碰巧就可以做到的。 你必须通过后天学习来掌握这个技能。&lt;/p&gt;
+
+&lt;p&gt;并且，我保证，任何一个男人都可以学会……&lt;/p&gt;
+
+&lt;h2&gt;错误7：以为“金钱”和“长相”是吸引女人的关键&lt;/h2&gt;
+
+&lt;p&gt;我发觉很多男人还没开始就已经放弃了……这是一个很常见的错误&lt;/p&gt;
+
+&lt;p&gt;因为他们以为女人只对帅哥和有钱的男人感兴趣……或者长得高的男人……或者某个年龄的男人。&lt;/p&gt;
+
+&lt;p&gt;当然，的确是有一部分女人只对这些东西感兴趣。&lt;/p&gt;
+
+&lt;p&gt;但是，绝大部分女人更看重一个男人的个性特征，远远比对他的钱包和相貌感兴趣。&lt;/p&gt;
+
+&lt;p&gt;有一些目前只有少数男人才知道的“个性特征”，可以很轻易吸引任何女性，并且让女人无法控制，就像吸铁石一样……这就是为什么你可能发觉有些在我们男人眼里并不怎么样的男人，在生活中总是被各种女人围着转。&lt;/p&gt;
+
+&lt;p&gt;准备好，我下面要讲的话会让你立刻兴奋起来……&lt;/p&gt;
+
+&lt;p&gt;那是不是意味着，一旦你学会了那些“个性特征”并且知道如何运用它们，你就能成为那个非常吸引女人的男人。&lt;/p&gt;
+
+&lt;p&gt;让我再说一遍:  如果你知道如何正确使用你的肢体语言和交流技巧等被我称作为“潜沟通”的东西，来展现这些神秘的个性特征, 那么你就可以让女人对你感觉到那种强大的性吸引力，就和你自己看到性感、火辣美女时感到的那种相同的“感觉”。&lt;/p&gt;
+
+&lt;h2&gt;错误8：在意女人所说的话&lt;/h2&gt;
+
+&lt;p&gt;如果我爱她，我就得在意她说的每一句话。她说她不喜欢我这样说话我就不这样说，她说我这件衣服不好看，&lt;/p&gt;
+
+&lt;p&gt;我就再也不去穿它，她说她不喜欢带眼镜的男人我就带隐形眼镜……&lt;/p&gt;
+
+&lt;p&gt;在意女人说的话，是很多男人经常犯的一个错误。&lt;/p&gt;
+
+&lt;p&gt;这很正常。&lt;/p&gt;
+
+&lt;p&gt;只是女人的第六感可以立刻感觉到，你总是在意她说的话，这样她会觉得你已经足够重视她了。&lt;/p&gt;
+
+&lt;p&gt;她已经没有必要为了让你在意她而付出任何努力了。 &lt;/p&gt;
+
+&lt;p&gt;换句话说：&lt;/p&gt;
+
+&lt;p&gt;她可以现在像放风筝一样把你放在天上，想见你的时候打个电话让你请她吃饭，不想见你的时候，你电话她，&lt;/p&gt;
+
+&lt;p&gt;她就觉得你烦。你发短信QQ，她都不回。 更或者，她已经偷偷地在和别的男人约会了。&lt;/p&gt;
+
+&lt;h2&gt;错误9：不知道具体每一步该怎么做，才能吸引女人，让她成为你的女人&lt;/h2&gt;
+
+&lt;p&gt;现在我要告诉你一个让你吃惊的消息……&lt;/p&gt;
+
+&lt;p&gt;女人在读懂肢体语言、语音语调等被我称作为“潜沟通”方面的能力比男人强10倍。  是的，这是整整10倍。&lt;/p&gt;
+
+&lt;p&gt;我知道这很难让你相信。  但这是事实！&lt;/p&gt;
+
+&lt;p&gt;举个例子，当你和一个女人走出去约会，你想牵她的手，她知道。  你想亲她，她还是知道。&lt;/p&gt;
+
+&lt;p&gt;但是，如果你在想亲她的时候，却不知道具体应该怎么去做，而只是傻傻得坐在那里，心理无比紧张。 兄弟，你放心！她完全知道，但她绝对不会主动，不会“帮”你。&lt;/p&gt;
+
+&lt;p&gt;这种情况会发生在你和女人相处时的任何一个阶段。&lt;/p&gt;
+
+&lt;p&gt;想去认识某个女孩的时候，问女人要电话的时候，想要亲她的时候，约她出来的时候，或者想和她发生身体关系的时候……任何阶段。&lt;/p&gt;
+
+&lt;p&gt;如果你不知道，在每个阶段具体该说什么，该做什么的话，那么你很有可能把你们的关系搞砸，让你们的关系到此为止……让你之前的努力全部白费。&lt;/p&gt;
+
+&lt;p&gt;我想你应该很清楚。&lt;/p&gt;
+
+&lt;p&gt;在和女人相处的时候，从第一次见面，一直到上床，其中具体每一步怎么做，至关重要。&lt;/p&gt;
+
+&lt;h2&gt;错误10：从不寻求帮助&lt;/h2&gt;
+
+&lt;p&gt;这是所有10个错误中，最大的一个。&lt;/p&gt;
+
+&lt;p&gt;正是这个错误，让绝大部分男人永远无法得到他们真正想要的女人和她们的爱。&lt;/p&gt;
+
+&lt;p&gt;我理解，我们男人不喜欢显露自己的弱点或无助的一面。 我们不喜欢寻求别人的帮助。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>牵手测试</title>
+   <link href="http://tuohuang.info/hold-her-hand"/>
+   <updated>2012-04-30T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/hold-her-hand</id>
+   <content type="html">&lt;p&gt;来自《迷上我》&lt;/p&gt;
+
+&lt;p&gt;如果我们比较投缘，聊了一段时间，我想知道我能不能牵她的手，我就会边走路边注视着她的头发，然后伸出手，从她的前额顺势轻抚一下她的头发，同时说：“有点乱了，不过你的头发很舒服。”然后停下脚步，转到她的侧前方，注视着她的头发，再一次轻轻的“整理”她的头发，如果此时，她的头没有向我身体的另一边倾斜，而是保持在原位或甚至是往我身体的方向微微靠，这个时候我知道我可以牵她的手了。我不会很急，我缓缓地将我的手移开她的秀发，似有似无的擦过她的手臂，轻轻地搭着她的手指，然后转过身，握住她的手，继续走。&lt;/p&gt;
+
+&lt;p&gt;这个“牵手测试”，让这一切发生得如此自然，我带有善意，如此绅士。我没有给他拒绝我的理由，我没有去询问她可不可以牵你的手。因为，她可以回答不。现在用不着她的许可，我已经握着她的手了。而且我永远不会被拒绝。更让我兴奋得是，现在我只需要短短几分钟的时间，我就能立马判断我是不是可以牵她的手，以前可能需要几天几夜几个月甚至几年才会弄明白的，也可能就这样一辈子错过了。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>冷读的句子</title>
+   <link href="http://tuohuang.info/cold-reading-sentence"/>
+   <updated>2012-04-30T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/cold-reading-sentence</id>
+   <content type="html">&lt;ul&gt;
+&lt;li&gt;你之所以这么难过，是因为在心灵的最底层，你是个在乎而且渴望真爱的人。这样的你，可爱多了。。。&lt;/li&gt;
+&lt;li&gt;我觉得你还蛮可爱的，只是不知道你有没有内涵&lt;/li&gt;
+&lt;li&gt;虽然你外表看起来很坚强，但是内心还是很女人的。&lt;/li&gt;
+&lt;li&gt;有时你很外向，善于交际与人和乐，有时你很内向，深居简出谨慎小心&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>话题</title>
+   <link href="http://tuohuang.info/chat-theme"/>
+   <updated>2012-04-26T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/chat-theme</id>
+   <content type="html">&lt;p&gt;来自查克&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;hi，刚刚看到你，觉得你看起来像这个酒吧最正常的女孩，所以过来打个招呼&lt;/li&gt;
+&lt;li&gt;Hi，刚刚看到你，觉得你挺可爱的 (我觉得你看起来非常友好)，所以过来打个招呼&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;现在招呼打完了你有什么好的建议吗？&lt;/p&gt;
+
+&lt;p&gt;因为朋友在那边一会我要去照顾一下，那我们聊两分钟&lt;/p&gt;
+
+&lt;p&gt;提升购买度：（三选一）&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;在酒吧漂亮的女孩虽然很多，她们总是用着一样的粉底，一样的眼线和一样的假睫毛，但你看起来很自然（回答）表情有一点点严肃。（筛选+给予IOI 微观调节）&lt;/li&gt;
+&lt;li&gt;你看起来有点像萝卜，我是说腿。( 高分 IOD )&lt;/li&gt;
+&lt;li&gt;我觉得你的眼睛看起来挺友善的，有点像小松鼠。（正常 IOD）&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;展开外界话题&lt;/p&gt;
+
+&lt;p&gt;你和我的话题&lt;/p&gt;
+
+&lt;p&gt;我们的话题&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>无力</title>
+   <link href="http://tuohuang.info/feelings"/>
+   <updated>2012-04-25T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/feelings</id>
+   <content type="html">&lt;p&gt;跟cm说分手了，因为我发现我心里真的没有她。而我心中的那个女孩，已经有了喜欢的人，可惜不是我。我现在已经无法感到忧伤、遗憾或者伤感。也许这就是踏上PUA之路的代价吧。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>摧垮女人的冷漠塑造你的魅力zz</title>
+   <link href="http://tuohuang.info/crash-women"/>
+   <updated>2012-04-23T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/crash-women</id>
+   <content type="html">&lt;p&gt;我是祝福。&lt;/p&gt;
+
+&lt;p&gt;我从很早就开始思考怎样真正塑造出自内而外的魅力。&lt;/p&gt;
+
+&lt;p&gt;技巧和话术固然重要，但是它们所起到的作用也只能是短时间的迷惑住女人。我曾经说过一句话，短期是伪装出魅力，而长期是塑造出魅力。下面是我的心得，原创，希望能够帮到你。&lt;/p&gt;
+
+&lt;p&gt;想要做到真正的拥有魅力首先要做到以前的几点前提。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;第一点&lt;/strong&gt;：首先要解决你的后顾之忧，将你的生活引入正轨。你对现在的生活感到满意，你热爱现在的生活是这一切的基础。如果你的生活事事如意，你就可以随心所欲、尽得其乐。相反你抱怨现在的生活，有各种各样的事束缚着你，比如学业工作生活，你就无法装出有魅力的样子，这些生活中纷杂的事会让你直不起腰。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;第二点&lt;/strong&gt;：保持微笑，记住是微笑。微笑是一种积极向上的态度，能够给人好感，而微笑又不给人张扬和幼稚的感觉。有魅力的人是时刻保持冷静的人，泰山崩于前而面不改色，在关键时候危机时刻，你的冷静会给人无比的安全感。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;第三点&lt;/strong&gt;：有属于你风格和标志的东西，让别人想到你就能具体的想到你这个人独特的形象。比如说代表你风格的衣服，你独特的兴趣爱好，你在某一方面出众的才华。像舞台男的话术，七烟的开心法则，墨菲斯的心性吸引，这些就是他们独一无二的标签，我想他们早就已经意识到品牌的作用。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;第四点&lt;/strong&gt;：保持你内心世界的丰富。这里你需要做的是多学习多读书，到处走走增长见识，多于人沟通。你内心世界的丰满会让你在任何时候从容不迫，会让你有自己的理解，自己的价值观，而不会人云亦云，不会过多在意别人的看法。很多人以为幽默是在女人面前嘻嘻哈哈，那是孩子气。真正的幽默是在你有丰富内涵的基础上有品味的幽默，是你对生活积极向上态度上迸发出的一种快乐的情绪。举个例子，我骑自行车被雨淋湿一身，我会笑着说“每当下雨时像我这种开敞篷车的人都会很被动”。&lt;/p&gt;
+
+&lt;p&gt;杰考瑞和我分享过共性和个性。&lt;br&gt;
+魅力对每个不同的女人也有共性和个性。一个人的魅力对你而言，是慑心动魄不可抗拒的，对别人可能就平淡无奇甚至不屑一顾。个性在这暂且不提，需要你自己去发现你的目标对什么样的更感冒，下面说的是魅力的共性。&lt;/p&gt;
+
+&lt;h2&gt;一.自信&lt;/h2&gt;
+
+&lt;p&gt;我将自信摆在第一位，因为不但是最重要的也是基础。最有吸引力的人是坚毅，刚强的人，一个不畏任何艰难困苦，敢于面对挑战，不断进取的强者。谁由愿与一个怕哭怕累，对生活毫无信心，悲观失望，浑浑噩噩的男人相守终身？&lt;/p&gt;
+
+&lt;p&gt;影响你自信的三个方面&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;对过去的憎恶&lt;/li&gt;
+&lt;li&gt;对现状的不满&lt;/li&gt;
+&lt;li&gt;对未来的迷茫&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;如果你对上面说的感到不太理解，请看我以前发的阐述自信的帖子，这里不提。&lt;/p&gt;
+
+&lt;p&gt;眼神和微笑最能体现一个人自信。看下路上匆匆的行人，是不是大部分眼中都带着迷茫，你觉得他们是自信的吗？如果你的眼睛老是在转动，如果你的眼睛不敢和女人对视，那说明他可能缺乏自信心。&lt;/p&gt;
+
+&lt;p&gt;一个自信的人的肢体语言必定是开放而自在。就是迷男所说的“你是世界上最舒适的人”。他的眼神坚定而非迷茫。他对自己自信，并坚信自己能够带给女人幸福和快乐。&lt;/p&gt;
+
+&lt;h2&gt;二.性感&lt;/h2&gt;
+
+&lt;p&gt;性感是个很空泛的词。也许你在某个瞬间一个无意识的举动就会让人感觉很性感。而说什么内在气质，带动别人感觉的动作这类的泛泛而谈对你们而言就太扯淡了。说一些有用的吧，一个强壮的身体，一个磁性的嗓音很让你无比性感，所以建议大家坚持运动，一个活力四射的人会有无穷的吸引力。&lt;/p&gt;
+
+&lt;p&gt;而一些动作也会让你某一时刻魅力无穷&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;眼神沿着鼻梁向下看&lt;/li&gt;
+&lt;li&gt;减缓你转过头的速度&lt;/li&gt;
+&lt;li&gt;强有力的拥抱&lt;/li&gt;
+&lt;li&gt;沉默但目光专注的时候&lt;/li&gt;
+&lt;li&gt;交谈时身体后倾&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;三. 勇敢&lt;/h2&gt;
+
+&lt;p&gt;敢于冒险的男人必定是个有趣的男人，有魅力的人不会过多的将心力放在抱怨生活中的琐事上，他们充满着活力和激情，热衷于发现平凡生活中每天不一样的地方，每天充满着斗志，遇到挫折不会轻易放弃。&lt;/p&gt;
+
+&lt;p&gt;在泡学上的衍生是不会被女人的拒绝和冷漠影响，敢于承担责任，不会去问女人“我可以牵你手吗”“我可以吻你吗”这类的。愿意尝试新的东西，带给女人不一样的体验，在关键时刻带领女人。&lt;/p&gt;
+
+&lt;p&gt;勇敢的几个特质&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;保持好奇心&lt;/li&gt;
+&lt;li&gt;勇于承担责任&lt;/li&gt;
+&lt;li&gt;喜欢冒险&lt;/li&gt;
+&lt;li&gt;关键时刻挺身而出&lt;/li&gt;
+&lt;li&gt;敢于尝试新鲜事物&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;四.富有爱心&lt;/h2&gt;
+
+&lt;p&gt;我想问一下各位，当你在路上看到有人需要帮助，在你犹豫不决要不要上去帮忙时，有人自然的上去提供帮助，你对那个人有什么看法？换位思考，你这样做别人会怎么想，呵呵，各位不要在意一些没素质没教养的人看法啊。有魅力的人会把力所能及的帮助别人看成很自然的事，很多女人给我的反馈是，她们觉得真诚帮助别人的男人最有魅力。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;乐于帮助别人&lt;/li&gt;
+&lt;li&gt;喜欢小孩子小动物&lt;/li&gt;
+&lt;li&gt;尊重别人&lt;/li&gt;
+&lt;li&gt;孝顺家人&lt;/li&gt;
+&lt;li&gt;对朋友讲义气&lt;/li&gt;
+&lt;li&gt;同情弱者。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;很多朋友在论坛汲取他们所需要的却不愿意分享，甚至连简单的回复都不愿意，常常看到几千的阅读量却寥寥可数的几人回复，完全磨灭了楼主发帖的积极性，这样的人是不会有魅力的。&lt;/p&gt;
+
+&lt;h2&gt;五.感性&lt;/h2&gt;
+
+&lt;p&gt;又是一种玄奥难明的东西。当你用一种深情的目光看着她，当你带着她回忆以前在一起的美好，憧憬未来的浪漫，这就是感性。简单的说就是多愁善感。男人的感性会让你很有魅力，但是切记过多的感性会让你失去阳刚。还有优柔寡断不是感性，是缺乏决断力缺乏自信的表现。&lt;/p&gt;
+
+&lt;h2&gt;六.神秘&lt;/h2&gt;
+
+&lt;p&gt;神秘之所以是吸引的利器，是因为你给了她太多的不确定，太多的幻想，太多的期待。还记得阿飞正传里咪咪对阿飞朋友说的话吗。“你知道他（阿飞）在想什么吗？”“但我知道你在想什么，你不要追我啊”。所以咪咪对对她冷漠的阿飞痴迷，而拒绝一片痴情的朋友。&lt;/p&gt;
+
+&lt;p&gt;（举几个例子，你可以在大家都要出去玩时不去，说自己有事，问你有什么事也不要说，然后走掉，或者说你们先去，我一会就到。回来时也不要告诉他们你干什么去了，这样大家就会感觉你神神秘秘的。在或者连续几天一到某一时间就回家，别人会说这小子这几天都这样，不知道在做什么事呢【非原创】）&lt;/p&gt;
+
+&lt;p&gt;做出很神秘的感觉的目的只有一个，就是让对方期待。想让她喜欢你就要让她脑子里有你，不用管她对你是想好还是想坏，只要她想那就达到目的了。&lt;/p&gt;
+
+&lt;p&gt;神秘感的另一种途径，反撇，这个论坛上太多，不需多说。当你对女人若离若即让她拿不住你的态度你的想法时，也是神秘。&lt;/p&gt;
+
+&lt;h2&gt;七.广泛的爱好&lt;/h2&gt;
+
+&lt;p&gt;广泛的爱好不会让你给人沉闷的感觉，而且在聊天中会源源不断给你提供素材。这也是建立世界丰富的一个途径。
+没有人喜欢和总是抱怨和喋喋不休的人在一起，用心去热爱你的生活。一个充实的生活对人的积极影响非常之大，充满抱怨的生活只会浪费你的精力。很多人喜欢在QQ里发一些感概和无病呻吟来赢得关注和女神的关心，我现在告诉你，你这样做只会让人瞧不起你，你的女神也会一笑而过。魅力的男人是不会抱怨自己的生活，因为生活过的好与坏把握在他们自己手中。&lt;/p&gt;
+
+&lt;h2&gt;八.细心&lt;/h2&gt;
+
+&lt;p&gt;细心是男人魅力突然迸发的一个很有用的方法。比如在走路的时候，突然弯下腰帮她系好散掉的鞋带。在约会天冷时轻轻将自己的衣服披在她的身上。记住她来经的时间等等。&lt;/p&gt;
+
+&lt;h2&gt;九.宽容和理解&lt;/h2&gt;
+
+&lt;p&gt;一个正真有魅力的人是会独立思考并不会给自己找太多理由的人，我听到太多的人不停的给自己找理由了， 有多少事因为这样那样的理由而没有去做。这样会给你留下消极的阴影。有吸引力的男人眼神必定是清澈而又充满神采的，因为他明白自己要干什么，明白自己想干什么，明白自己的追求。&lt;/p&gt;
+
+&lt;p&gt;呵呵，也许大道理讲多了吧，熬夜发帖太累了，如果你有好的见解和意见，请给与分享，或者有独特见解帮我完善，非常感谢。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>玩暧昧十则</title>
+   <link href="http://tuohuang.info/dubious-relationship-rules"/>
+   <updated>2012-04-20T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/dubious-relationship-rules</id>
+   <content type="html">&lt;p&gt;转自&lt;a href=&quot;http://bbs.ximisu.com/thread-2163-1-4.html&quot;&gt;http://bbs.ximisu.com/thread-2163-1-4.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;本文只适合那些想和女孩子玩暧昧的男人，不适合用来作为追女孩子的行为指南。&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;在办公室里主动为她解决电脑问题，示意她不必站起来，弯下你的腰，一手扶着她的椅背，一手握鼠标，然后把你的脸凑过去和她的脸保持一个巴掌的距离－－注意必须确保你口气清新；&lt;/li&gt;
+&lt;li&gt;约她吃饭、喝咖啡、吃冰淇淋、泡吧不必附带任何理由，就像普通朋友一样。如果每5次里有一次她会主动付帐，那就让她付好了－－每次都自己付钱，一来人家会误会你在追求她，二来有些女孩子也会心里不安。&lt;/li&gt;
+&lt;li&gt;赞美她新买的靴子或者耳环，告诉她你很喜欢这种款式或者颜色－－但是记住夸一句就够了，不要多，夸完以后该干吗继续干吗。　&lt;/li&gt;
+&lt;li&gt;有车的话在开车送她回家时，不必下车相送，坐在车里目送她走进大堂或者楼道即可－－热情的为她开车门并且暗示自己想上去喝口水那是玩儿暧昧者的大忌！&lt;/li&gt;
+&lt;li&gt;周一到周五下班后如无特殊情况，短信不宜每天都发，即使要发也不要超过5个来回，周末如果没有见面，则必须短信问候，但也不宜超过10个来回－－但如果某天晚上一起吃了饭或去了哪里玩，则在送她回去后的10分钟内必须发短信问候，切记！&lt;/li&gt;
+&lt;li&gt;关注她的健康状况。很多女孩子胃都有小毛病，打听好她平时疼起来吃什么药，然后在办公室的抽屉里或者车厢储物阁里很“巧合”的备上一瓶－－注意不要把痛经和胃痛搞混，两者疼起来捂的位置明显不同。　&lt;/li&gt;
+&lt;li&gt;两人在一起的时候尽量少去光线不好的地方，记住你玩儿的是暧昧，光线幽暗的地方，例如电影院、西餐厅、夜晚的公园等，会让女孩子心神混乱继而以为你在追求她。　&lt;/li&gt;
+&lt;li&gt;暧昧的话语和玩笑必须在短信里或者MSN/QQ里面说，绝不能是当面，电话里也不行！另外所有暧昧玩笑必须通过一个适当的方式转换成正常话题，不恰当的中断也会让对方造成误会－－当然，一个礼拜可以来一次那种美丽的误会，但不宜超过1次。&lt;/li&gt;
+&lt;li&gt;如果她有男朋友，绝不能说出任何对他们感情不利的话，在他们出现感情危机的时候，甚至要帮助她分析问题，解决问题－－但是要把握好度，一味的给她出谋划策劝说她与其男友重归于好反而有时会招致她某种原因的强烈不满！　&lt;/li&gt;
+&lt;li&gt;主动帮她拎东西，并顺便蜻蜓点水般的触碰一下她的手；一起走路的时候，借着摆动胳膊的动作很自然的轻轻碰一下她的肩膀或者胳膊－－要注意次数，一般半小时内两次就是极限了！&lt;/li&gt;
+&lt;li&gt;应邀陪她逛街的话，在知道她的喜好的前提下，很认真很用心的帮她挑选一到三款服饰，然后在她出试衣间的时候由衷的赞美她，如果那天是情人节以外的节日，还可以考虑在她进试衣间的时候，悄悄买一样小饰物（例如腕带、围巾），送她回家的时候送给她，并告诉她这件东西和她今天买的衣服很衬。&lt;/li&gt;
+&lt;li&gt;不要在她面前描述你喜欢什么样的女孩，这是玩儿暧昧者的大忌－－无论你描述出来的样子是不是就是她的样子，结果都不利于继续保持暧昧的关系。&lt;/li&gt;
+&lt;li&gt;对于玩儿暧昧的你，有些户外活动是不适合与她单独进行的，例如游泳（包括水上乐园）和野营。&lt;/li&gt;
+&lt;li&gt;玩儿暧昧的男人永远要掌握主动权，这就意味着一旦她向你开暧昧玩笑的时候，马上把她的问题换一种方式返回过去，然后在她还未来得及回答的时候迅速说一声“这怎么可能呢？”，再爽朗的“哈哈哈”大笑三声。&lt;/li&gt;
+&lt;li&gt;管好你的下半身，记住你只是玩儿暧昧，不是玩儿欺骗。既然你不想给人家一个未来，那么在感情上占人家便宜已经是你做为男人的道德底线了，千万不要在身体上再伤害人家。&lt;/li&gt;
+&lt;li&gt;最后，确认一下你的心智是否足够承受所谓的暧昧。玩儿暧昧不容易，很多人玩儿到最后玩儿成了两败俱伤，又或者不得已接受了对方。唉，早知如此，何必当初啊……&lt;/li&gt;
+&lt;/ol&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>聊天话题</title>
+   <link href="http://tuohuang.info/talk"/>
+   <updated>2012-04-11T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/talk</id>
+   <content type="html">&lt;p&gt;&lt;strong&gt;chuck街头搭讪：&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;我：HI 你好，我只有一分钟的时间，但是我想跟你的朋友说两句话。（对着障碍）&lt;/p&gt;
+
+&lt;p&gt;障碍没有说话但是两个人定住了，我对目标说。&lt;/p&gt;
+
+&lt;p&gt;我：我正准备去见朋友，但是想认识你一下。&lt;/p&gt;
+
+&lt;p&gt;这时候障碍说你不是推销的吧，我说一我不是推销的，二我不是卖房的。&lt;/p&gt;
+
+&lt;p&gt;这时候双人组开始缓慢移动，我超过他们大概1米侧身说话。&lt;/p&gt;
+
+&lt;p&gt;我：是这样，我正准备见朋友，在那边看到了你，我觉得你的气质不错，所以犹豫了一下，还是决定过来打个招呼，如果我不来可能会有点后悔，我过来打招呼什么都没想，只是想试着认识你，因为有本书上说，谁都是从不认识到认识的，只有还未认识的朋友，虽然这里不是一个很传统的社交场合，但我还是过来了。（莫菲斯情景回放，自己稍微修改了一下）
+障碍：你是做什么的？&lt;/p&gt;
+
+&lt;p&gt;我：我是做互联网的，是这样朋友在等我，所以我得走了，我们是否方便留个联系方式。&lt;/p&gt;
+
+&lt;p&gt;目标：我马上就要离开北京了&lt;/p&gt;
+
+&lt;p&gt;我：没关系～朋友之间没有界限，（俩人笑），你说你的号吧&lt;/p&gt;
+
+&lt;p&gt;目标：134XXXXXXX&lt;/p&gt;
+
+&lt;p&gt;我：刚才有点冒昧，因为我实在想不出该如何认识一个我感兴趣的陌生人，但是我不想后悔，朋友在等我我得走了，认识你们很高兴。（莫菲斯惯例 感谢～）&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;蓝色答案在夜店里：&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;我跟她碰杯，开启了话题：看你的样子应该是南方人吧&lt;/p&gt;
+
+&lt;p&gt;她：恩，那你猜我是哪里人呢？&lt;/p&gt;
+
+&lt;p&gt;我：你猜，我猜不猜？（一个非常好玩的话术）&lt;/p&gt;
+
+&lt;p&gt;她笑：别废话了，猜吧。&lt;/p&gt;
+
+&lt;p&gt;我：其实这个不重要，重要的是，你身上有一点很吸引我，你知道是什么吗？&lt;/p&gt;
+
+&lt;p&gt;她：？&lt;/p&gt;
+
+&lt;p&gt;我：你的额头，北京美女很多，但是额头长得漂亮的很少。&lt;/p&gt;
+
+&lt;p&gt;她：是吗，我的额头就是有点高。&lt;/p&gt;
+
+&lt;p&gt;我：我觉得北京这个城市其实挺糟糕的，北方对我来说实在太冷了。我记得去年我搬来北京的第一个晚上，站在空旷的街道上，冷风呼呼地吹，我忽然有一个感觉，我为什么要来这个鬼地方。&lt;/p&gt;
+&lt;/blockquote&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>开场</title>
+   <link href="http://tuohuang.info/opener"/>
+   <updated>2012-04-11T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/opener</id>
+   <content type="html">&lt;p&gt;蓝色答案流开场白：你好，我刚才在那边看见你，觉得你很可爱，所以过来打个招呼。现在招呼也打了，你有什么建议吗？（女生一般都说没有）好，（我朋友在那边，一会儿我去找他们，）那我们聊一分钟吧……&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>行动起来</title>
+   <link href="http://tuohuang.info/take-actions"/>
+   <updated>2012-04-09T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/take-actions</id>
+   <content type="html">&lt;p&gt;周五晚上跟chuck去拿铁实战。现在把心得记录于此。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;一定要开口说，不管说什么，不管对与错，去尝试各种开场白，去感受被打枪的感觉&lt;/li&gt;
+&lt;li&gt;蓝色答案流开场白：你好，我刚才在那边看见你，觉得你很可爱，所以过来打个招呼。现在招呼也打了，你有什么建议吗？（女生一般都说没有）好，（我朋友在那边，一会儿我去找他们，）那我们聊一分钟吧……&lt;/li&gt;
+&lt;li&gt;聊的话题要有吸引力，要有互动&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;后来我又跟hanyi去三里屯酒吧街转了几家店，hanyi还被一位外国大叔搭讪了，呵呵。感觉酒吧街还挺好玩的，有家叫“红”的店音乐不是很吵，适合搭讪。&lt;/p&gt;
+
+&lt;p&gt;周六晚上约了jiayuan的一个mm去跳舞，跳舞的过程肢体接触是难免了，另外，我也稍微主动地进行更高级别的kino。&lt;/p&gt;
+
+&lt;p&gt;最后回去的时候，路上我牵着她的手走，偶尔搂着走。&lt;/p&gt;
+
+&lt;p&gt;在公交车站等车的时候，她说累，我就把她的头放在我肩膀靠着她，她靠了一会儿，然后干脆从前面抱住我靠着我肩膀。&lt;/p&gt;
+
+&lt;p&gt;到地铁后，看到一辆车就急忙上去，我和她方向相反，我说“你想我跟你回去吗？我可住在反方向”，然后我们说好下站下，就在这一站的时间里，她正面抱住我。当我要下车的时候，我过去亲她，被她反复躲过了。我也没太强迫，就下车了。下车后我定了定神，她回去一个小时时间，这一路上她心情肯定很乱，我不能打电话过去，那样她在地铁里不好接，我就发短信过去。&lt;/p&gt;
+
+&lt;p&gt;这时候不要说对不起，也不要表白。因为去年我跟她说只能做普通朋友，算我拒绝了她，这次再这么主动就不合理了。我就说刚才我情不自禁的，因为今天和你一起跳舞，感觉很好，很幸福。她说很吃惊我刚才的举动，认为我是头脑发热。&lt;/p&gt;
+
+&lt;p&gt;后来她到家后我们电话聊，她说原以为我只想跟她做朋友（扯啊，你见过普通朋友关系的朋友牵手拥抱的吗？）我说一年之后再见，觉得感觉很好，想进一步发展。她说她在跳舞的时候也有一瞬间亲不自禁抱住我。&lt;/p&gt;
+
+&lt;p&gt;第二天，我跟几个朋友k歌，约好了她也过来。k歌的时候我们也没表现得亲密，毕竟其他人跟她不熟。等到散场了，我跟她在ktv大厅的沙发上休息，那里没有其他人。我们聊天，她说累了，我就让她靠在我肩膀，后来她抱住我，说了会儿话，我去kiss她，这次没有反抗，很顺从，而且，她kiss起来很疯狂。kiss一会儿后要主动停止，后来又聊了会儿，再kiss。&lt;/p&gt;
+
+&lt;p&gt;后来我们都有事，就分开了。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>表达感受</title>
+   <link href="http://tuohuang.info/feel-in-the-deep"/>
+   <updated>2012-03-25T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/feel-in-the-deep</id>
+   <content type="html">&lt;h2&gt;表达感受&lt;/h2&gt;
+
+&lt;p&gt;昨天跟寒冰上街活动，回来一路上聊，讲述彼此的经历。其实我是不点不通，对别人根本不是问题，对我来说却是非常大的问题。&lt;/p&gt;
+
+&lt;p&gt;我最大的问题是，不会表达感受。在和目标交流的时候，并不是有效的交流。有效的交流要求对方接受你的信息，从你的话语中，感觉出你这个人怎么样。除了是否风趣幽默以外，还需要知道你是个什么样的人，对人对事的态度如何，对她的态度如何，你对你们关系是如何定位的。难怪曾经有目标在跟我接触几年后，仍然说对我不了解，因为我跟她在一起的时候，除了闲聊以外，不涉及到上面说的这几个话题。&lt;/p&gt;
+
+&lt;p&gt;不是我不用心，是我真的没概念啊，冤死了。&lt;/p&gt;
+
+&lt;p&gt;以后不能再这样了，要学会感性，和目标在一起要留心感受，然后在适当的时候，用适当的语言表达出来。&lt;/p&gt;
+
+&lt;p&gt;比如寒冰跟我讲过，他说跟女生约会之后，表达出和她一起很开心，但是光说这个不够，要说点具体细节的话，会显得很真诚。尤其是发现到对方的优点，这么说“没想到。。。”&lt;/p&gt;
+
+&lt;h2&gt;确定关系情话&lt;/h2&gt;
+
+&lt;p&gt;这是辛巴以前提过的，联系到寒冰讲的，刚好可以对应起来。在临门一脚的时候，说说情话，彻底解除对方防备。&lt;/p&gt;
+
+&lt;h2&gt;废物测试&lt;/h2&gt;
+
+&lt;p&gt;场景一：在夜店&lt;br&gt;
+MM：你有女朋友吗？&lt;br&gt;
+PUA：有啊，我把她气跑了。  &lt;/p&gt;
+
+&lt;p&gt;场景二：拉MM去开房，MM想了一会儿说&lt;br&gt;
+MM：如果我拒绝，你会怎么办？&lt;br&gt;
+PUA：我只是想和你待会儿。  &lt;/p&gt;
+
+&lt;h2&gt;讲故事&lt;/h2&gt;
+
+&lt;p&gt;讲故事的时候要有目的，你在这个故事里，植入了哪些表现自己品质的桥段，或者是为了引起MM的共鸣，打开MM的心扉。在讲故事的时候要有互动，不能自己一直在那儿讲，让对方感觉跟她没关系，让她也参与到故事里去。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>与寒冰的对话</title>
+   <link href="http://tuohuang.info/talk-with-hanbin"/>
+   <updated>2012-03-23T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/talk-with-hanbin</id>
+   <content type="html">&lt;p&gt;昨天跟寒冰（chuck）见了面，聊了很久，他仔细分析了我这几个月来和女孩约会的前前后后，找出我的问题。总结下来有这么几点：&lt;/p&gt;
+
+&lt;h2&gt;谈话和互动要有波动性&lt;/h2&gt;
+
+&lt;p&gt;女人都是情绪动物，如果跟她的互动过程中，能量一直处于一个状态，她就会觉得很平淡，会觉得无聊。所以我们在跟女孩谈话和互动的过程中，要切换状态，时而平淡，时而制造刺激的感觉，有点意想不到的举动。&lt;/p&gt;
+
+&lt;h2&gt;不怕打断话题 多重话题&lt;/h2&gt;
+
+&lt;p&gt;多重话题也是制造波动的一种方法，专指在谈话过程中，不怕打断本来已经开始的话题，跳到下一个话题，一旦新的话题聊得差不多了，又可以跳到原来的话题。我在别的地方看到的说法，说跟女孩聊天，不需要聊很深的话题，随便聊就行，但是要有趣，然后又能不断跳跃，让女孩觉得和你在一起又聊不完的话题。&lt;/p&gt;
+
+&lt;h2&gt;敢于打破和谐&lt;/h2&gt;
+
+&lt;p&gt;前面说的是吸引或者是初期舒适感的阶段，后期舒适感要加强了，不能一直停留在朋友的那种舒适感。AFC Adam的理论把GAME的过程分成，制造和谐和打破和谐这两步。七烟也有和谐的feel和不和谐的feel这种说法。&lt;/p&gt;
+
+&lt;h2&gt;转场进入私密空间&lt;/h2&gt;
+
+&lt;p&gt;寒冰建议，每次约会前，要找好至少2个地点，要有转场的过程，最后到达私密空间，只有你们俩，环境安静、暧昧。转场可以让女生觉得时间过了很久，经历了很多。然后转场又带来情绪上的波动。进入私密空间也是为了下一步的行动。&lt;/p&gt;
+
+&lt;h2&gt;从表达感受到兴趣声明&lt;/h2&gt;
+
+&lt;p&gt;在私密空间，聊天就要不一样了。经过了训练，我变的不闷了，但是，女生依然觉得跟我在一起像朋友。为什么呢？因为我和女孩聊的话题，要么就是插科打诨，要么就是聊我工作生活中的趣闻，这都是关于“我和这个世界之间”怎么怎么样的。但是，如果你想和女孩建立起更深的关系，就必须聊一些“我和你之间”的话题，多说一些感受。我的缺点就是，理科思维，粗线条，没有感受，不会表达感受。我应该在进入到私密空间以后，从谈论自己的感受开始，诱导出她谈感受，然后接着，我讲对她的感觉，我希望我们的关系走向哪里。。。我打算天天写日记，多愁善感起来。&lt;/p&gt;
+
+&lt;h2&gt;牵手kiss时的说辞&lt;/h2&gt;
+
+&lt;p&gt;寒冰问我，你第一次牵起女生的手，说什么？我疑惑。其实我不知道要有这个桥段。我一个朋友说，会说牵手惯例，比如问，你知道小学生中学生大学生怎么牵手的吗？寒冰这时候说“我觉得今天很开心，没有别的意思”，这个我要多想想，多试试。&lt;/p&gt;
+
+&lt;h2&gt;制定计划 不断升级&lt;/h2&gt;
+
+&lt;p&gt;要给自己定计划，几次约会，每次约会升级到哪一步。寒冰说他给自己定的是三次约会，第一次拉手，第二次kiss，第三次那就无所谓了。&lt;/p&gt;
+
+&lt;h2&gt;不要等待 勇敢出击&lt;/h2&gt;
+
+&lt;p&gt;我觉得这样下来，思路就清晰了。曾经很多次，在我还没接触泡学和这帮哥们的时候，朋友或者其他女性朋友在我追女生的时候，他们是没有概念的，只会说，你要对她好，你要说甜言蜜语，你要用心... 当我失败的时候，他们只会说，你还不够用心，你没有遇到缘分。果真如此吗？。。。 这些是没有用的，也许重要但不是关键，有些还是完全错误的。只有泡学才能救宅男。作为宅男，不要整天待在家里幻想你的朋友给你介绍女朋友，也不可能某一天你就遇到一个梦中的女孩，然后她恰好就喜欢你。要在不断的磨练中提高自己，我们的目标是，当某天你遇到真正喜欢的女孩，你有足够的能力hold住她。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>不相信命运</title>
+   <link href="http://tuohuang.info/there-is-no-destination"/>
+   <updated>2012-03-22T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/there-is-no-destination</id>
+   <content type="html">&lt;p&gt;哥不相信有命运这种东西。自身天然禀赋差没关系，我需要努力。&lt;/p&gt;
+
+&lt;p&gt;暧昧不是最终目标，要想着如何升级，如果不让升级，就拉倒，还想什么呢？&lt;/p&gt;
+
+&lt;p&gt;升级，升级，不断地升级！&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>暧昧框架</title>
+   <link href="http://tuohuang.info/sex-tension"/>
+   <updated>2012-01-17T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/sex-tension</id>
+   <content type="html">&lt;p&gt;一开始交往时，不要陷入朋友框架。要进入暧昧框架。&lt;/p&gt;
+
+&lt;p&gt;复习了一下&lt;a href=&quot;http://www.docin.com/p-9364441.html&quot;&gt;暧昧的张力&lt;/a&gt;。提纲如下：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;言语暧昧
+
+&lt;ul&gt;
+&lt;li&gt;在言语中放入感性字眼&lt;/li&gt;
+&lt;li&gt;使用角色扮演（老公老婆、骑士公主、老师学生...）&lt;/li&gt;
+&lt;li&gt;谈有关性的话题&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;li&gt;肢体接触
+
+&lt;ul&gt;
+&lt;li&gt;没有暧昧意思的触碰&lt;/li&gt;
+&lt;li&gt;有暧昧意味的触碰&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2&gt;收放自如&lt;/h2&gt;
+
+&lt;p&gt;女人对于不舒服的肢体触碰容忍度其实很大。建议没有暧昧意思的肢体触碰少于3秒以下（搭肩、触摸身体等），触碰完以后马上轻松收回。&lt;/p&gt;
+
+&lt;h2&gt;牵手&lt;/h2&gt;
+
+&lt;p&gt;试试故意放松，看她会不会握紧一点，假如她的手都松松的，那对你可能就还没有到那种好感。&lt;/p&gt;
+
+&lt;h2&gt;把暧昧当做试探工具&lt;/h2&gt;
+
+&lt;p&gt;暧昧的张力，还有一个很大的好处，它能让你侦测女人对你的感觉如何。假如你讲出一句暧昧不清的话，看对方是正面回应还是负面回应，就能判断出她对你是否有好感。&lt;/p&gt;
+
+&lt;h2&gt;轻触女人手臂 搭讪必杀技&lt;/h2&gt;
+
+&lt;p&gt;本文还记载了报纸的一则科技小品文，内容如下
+&amp;gt;要约女生跳舞或要电话，短暂轻触对方肩膀或露出诚挚笑容才是必杀绝招。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;如果男方能在邀请女方跳舞时，轻轻触碰女方手臂短短一、两秒，会让三分之二的女生更乐意跟男生共舞。其中奥秘在于，短暂触碰让女方觉得这个男人更有主导力，因而增加对女性的吸引力。&lt;/p&gt;
+&lt;/blockquote&gt;</content>
+ </entry>
+ 
+ <entry>
+   <title>巧妇偏伴挫夫侧</title>
+   <link href="http://tuohuang.info/bad-guy-has-pretty-women"/>
+   <updated>2011-12-28T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/bad-guy-has-pretty-women</id>
+   <content type="html">&lt;p&gt;今天中午部门吃饭的时候听到的真实故事。&lt;/p&gt;
+
+&lt;p&gt;凡哥大学期间有个室友有小偷小摸的毛病，甚至偷宿舍同学的东西，室友们念在同学一场，怕影响他的前程，没有揭发他，哪知这也助长了他的坏毛病。家里给的学费也被他花光了，一次次骗家里说钱被人偷了，最后家里实在没办法就把钱直接打到老师那里。&lt;/p&gt;
+
+&lt;p&gt;大学四年下来，毕业证学位证他一样都没拿到。但是最后却找了个官二代的漂亮老婆。经常开着跑车带着老婆和名贵的狗在校园出没。&lt;/p&gt;
+
+&lt;p&gt;岳父给安排了工作，也不愁吃不愁穿的，他还是不知足，在外面养小蜜，直接导致了他和老婆离婚。离婚后又结婚，找的老婆又年轻又漂亮。&lt;/p&gt;
+
+&lt;p&gt;我擦，这是个什么世界，为社么这样的男人，这样一个道德底线很低的人，总是可以得到烂好人得不到的东西呢？&lt;/p&gt;
+
+&lt;p&gt;因为他道德底线低，所以无所顾忌，这不就是奸的好人里提到的吗？&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>一个女生说的</title>
+   <link href="http://tuohuang.info/girl-says"/>
+   <updated>2011-12-26T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/girl-says</id>
+   <content type="html">&lt;p&gt;关于牵手这件事，某女性朋友是这么说的&lt;/p&gt;
+
+&lt;p&gt;一、你是真心喜欢她，并且不打算放弃；&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;她也喜欢你，于是让你牵手，你表白成功在一起；&lt;/li&gt;
+&lt;li&gt;她不确定是不是要跟你在一起，但是对你有好感，牵手的时候犹豫，不让牵手，这时候你要表现地man一点，一笑置之，并且依然非常绅士地照顾她，下次还约她出来，她如果还出来，你就继续追，直到她答应你；&lt;/li&gt;
+&lt;li&gt;她只是对你有好感，但是也不确定是否要跟你在一起，拒绝牵手。但是下次你再约，约不出来，恭喜你，你可以换下家了；&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;二、（这种简单）你其实也不是很坚持非她不可，那么如下：&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;她也喜欢你，牵手成功，于是皆大欢喜；&lt;/li&gt;
+&lt;li&gt;她拒绝了，你无所谓，改变目标。 &lt;/li&gt;
+&lt;/ol&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>随想20111218</title>
+   <link href="http://tuohuang.info/some-thoughts"/>
+   <updated>2011-12-18T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/some-thoughts</id>
+   <content type="html">&lt;h2&gt;跟我在一起的理由&lt;/h2&gt;
+
+&lt;p&gt;松以前提过一个问题，女人到底是因为我们靠谱才愿意跟我在一起，还是因为觉得我有性吸引才跟我在一起的呢？&lt;/p&gt;
+
+&lt;h2&gt;到底要闹哪样？&lt;/h2&gt;
+
+&lt;p&gt;假设你说有好姑娘，我说给我介绍吧，说我急色，你们男人怎么都这个德行；表现得淡定点儿吧，说你是gay啊，好姑娘都不感兴趣，留给女人啊！！ 这不坑爹吗 &lt;/p&gt;
+
+&lt;p&gt;关于给男性朋友介绍GF，女人到底怎么想的？ 你只要牵个线搭个桥让两个不认识的优秀男女认识而已，又不是当老鸨。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>最近总结</title>
+   <link href="http://tuohuang.info/these-days"/>
+   <updated>2011-12-14T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/these-days</id>
+   <content type="html">&lt;p&gt;最近主要目标是小白，我需要检讨到是，对她，我还是范了几个错误。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;过多注重一起去什么活动，却在交流方面太少，缺乏互动&lt;/li&gt;
+&lt;li&gt;只有我一味付出，让她付出少，不只是金钱方面的&lt;/li&gt;
+&lt;li&gt;Kino少，其实她对我好像还挺有好感的，每次约都能约出来，应该勇敢地Kino，比如送她到楼下，离别的时候抱一下。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3&gt;对于时间长短的感想&lt;/h3&gt;
+
+&lt;p&gt;昨天在QQ上跟小戴表白了，其实也不算是表白，就是我说给她介绍男朋友，我说我怎么样，她说还是算了吧，认识这么久都没发生感情，以后也难了。&lt;/p&gt;
+
+&lt;p&gt;看到了吗？并不是认识时间长就好的，女人相信电光火石的是爱情，日久生情只能是“日”久生情。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>女人有选择强壮男人的本能</title>
+   <link href="http://tuohuang.info/women-choose-strong-men"/>
+   <updated>2011-12-13T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/women-choose-strong-men</id>
+   <content type="html">&lt;p&gt;近来，许多女性常常拥有数个男友，几乎是来者不拒。同时，还与数个男人保持着不一般的关系。这些女性，本身都已有固定的男朋友，可是，对于自己还能吸引其他的追求者，感到十分得意。而她们对这种胜利感，丝毫不觉得那是不道德的。依据生理学的观点来看，这是因为她们本能上想要选择较强的对象所致。生理学家艾理斯博士主张，人类会有动物所没有的处女膜，是根据自然法则而来的。处女膜的作用，是要选择可以攻破它的较强雄性，这可以防止传留下虚弱男人的下一代，而延续较优秀的子孙。这表示，男人天生就必须表现出“强者”的形态才行。 艾里斯博士认为 “处女膜会选择适当的男人” 。 确实，在男女关系上，男人是处于被选择的地位，所以女人会与数位男人交往，再从中选择最优者。你若认为她已有男友，便不再进攻，那你就是懦夫，相同的，如果你已经有特定的女友，也要小心，不让她被抢走。&lt;/p&gt;
+
+&lt;p&gt;来源：《恋爱的智慧》 &lt;a href=&quot;http://ishare.iask.sina.com.cn/f/14194018.html&quot;&gt;http://ishare.iask.sina.com.cn/f/14194018.html&lt;/a&gt;&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>《爱情阴谋论》读后感</title>
+   <link href="http://tuohuang.info/the-conspiracy-theory-of-love"/>
+   <updated>2011-12-13T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/the-conspiracy-theory-of-love</id>
+   <content type="html">&lt;p&gt;《爱情阴谋论》是本好书，作者江健勇。 爱情有可以理性分析的部分，也有不可理性分析的部分，
+作者承认爱情有不理性的部分，不理性的部分是无法讨论的，每个人的情况不同，作者针对爱情可以理性分
+析的部分 提出自己的看法分享人生经验。 书中内容大致可区分为“男女差异”、“好男人与坏男人”、
+“房中术”、“横刀夺爱”、“正妹心理学”， 除了房中术口说无凭不知道有没有用? 
+其他部分作者写得很有道理，作者擅长用比喻的方式解说他的理念想法。&lt;/p&gt;
+
+&lt;h2&gt;男女差异&lt;/h2&gt;
+
+&lt;h3&gt;之前与之后&lt;/h3&gt;
+
+&lt;p&gt;男性恋爱注重“之前”，一垒-&amp;gt;二垒-&amp;gt;三垒-&amp;gt;本垒。 本垒对于男性来说是结束，
+对于女性来说本垒是个开始。发生性关系之后，男性会放松女性则是要收网捕鱼，
+对男性的看管更加严厉。&lt;/p&gt;
+
+&lt;h3&gt;现在与未来&lt;/h3&gt;
+
+&lt;p&gt;歌德的话已经有提到，男性看女性会注重女性现在的条件，女性看男性象是买股票
+一样着眼于男性未来的潜力。&lt;/p&gt;
+
+&lt;h3&gt;专一与多工&lt;/h3&gt;
+
+&lt;p&gt;作者以原始社会的生活为例，男性负责狩猎，女性负责做家事带小孩，所以男性容易沉迷某一项事务，
+女性擅长多工同时精通很多项事务。作者举例女性比较 会主菜，但有名的大厨大部分都是男性。
+个人认为会有这种现象产生的原因与男性的变化度比女性多也有关系，变化度大造成男性好的部分会很好，
+自然修炼到顶尖 层级的大多是男性。&lt;/p&gt;
+
+&lt;h3&gt;繁衍与生存&lt;/h3&gt;
+
+&lt;p&gt;繁衍与生存是生物的两大本能，男性的精子一次可以有好几亿个，女性的卵子一个月只有一个比较珍贵。
+数量的不同影响两性的性观念，男性比较重量多多益善好繁衍自己的下一代，
+女性比较重质希望能够找到质量高的精主，以后生存好过一些。&lt;/p&gt;
+
+&lt;p&gt;作者认为女性与男性同样都会想嘿咻，然而女性会怀孕生孩子。“怀孕之后，
+丈夫会相陪在自己身边”与“怀孕之后，丈夫不会相陪在自己身边” 哪一种可能性高？ 
+会怀孕生子造成女性自我压抑，就没有像男性那样自由可以到处播种了。&lt;/p&gt;
+
+&lt;h3&gt;男女语言感受能力不同&lt;/h3&gt;
+
+&lt;p&gt;作者用一段爱情小说文字说明男女对于文句的感受不同，“他那饥渴的双手，很贪婪的征服了他的乳房，
+使她的身体颤抖出一阵放荡的快感。” 女性读者看了可能会有很多种感觉，男性读者看了只会有“爽”这个感觉。
+怪不得很多女性向的文学作品，都喜欢用一些华丽的词藻，因为男女对于文字的感受是大不相同的。&lt;/p&gt;
+
+&lt;h3&gt;好男人与坏男人&lt;/h3&gt;
+
+&lt;p&gt;对于好男人与坏男人的差别，作者有个妙喻，对于女人来说好男人是玩具熊，坏男人是震荡器。
+玩具熊是平常使用，震荡器是夜深人静的时候拿出来使用。 俗话说：“好人修电脑，坏人床上搞。” 
+作者的比喻很好，作者点出好男人是只知对女性一直好，坏男人是对女性有时好有时坏，女性才会记得坏男人的好。&lt;/p&gt;
+
+&lt;p&gt;作者有观察到一个社会现象让人感到人性的可悲，受过男友或丈夫暴力对待过的女性，脱离魔掌之后，
+若是她们有机会与好男人在一起，她们会对好男人很凶很坏，可见遭受暴力对待的女性，
+在被施暴的过程也是学习的过程。&lt;/p&gt;
+
+&lt;p&gt;男女差异与好男人坏男人的区别，在相关的两性书籍都有讨论过了，“不定性”、“ 横刀夺爱”、 
+“正妹心理学”才是本书的独特之处。&lt;/p&gt;
+
+&lt;h2&gt;“不定性”是种享受&lt;/h2&gt;
+
+&lt;p&gt;河东狮吼泼妇骂街是戏剧中常见的剧情，当男主角被女主角修理的时候看起来很痛苦，
+可是偏偏两人又无法分开，后来我领悟到男主角其实是在“享受”，人有斯德哥尔摩症候群可以解释这种怪现状。
+作者在书中提出“不定性”的观念也可以解释这种情况。 “不定性”是种享受，一时之间很难让人理解，
+但可以换个角度思考，“定性”是个可怕的情况，每天都过着一模一样的生活是很痛苦，
+因为已经知道未来会是什么样子了。&lt;/p&gt;
+
+&lt;p&gt;由于“不定性”是种享受，就可以体会傲娇悍妇的角色经常会出现在作品中，因为她们制造最大的不定性，
+每天可以过着不同的生活对男主角而言是种“享受”。&lt;/p&gt;
+
+&lt;h2&gt;正妹心理学&lt;/h2&gt;
+
+&lt;p&gt;作者认为美女都比较笨，这不是美女的错，而是从小的成长环境造成的。当美女遇到困难的时候，
+自然会有勇士出面帮美女解决问题，长久下来会造成美女的 智力退化。作者有观察到一个物极必
+反的社会现象，美女中最受欢迎的是八十分的次等美女，一百分艷光四射的美女反而没有八十分的美女受欢迎。&lt;/p&gt;
+
+&lt;p&gt;美女配丑男的原因在于互补，美女在优渥的环境下成长经常是花瓶，所以美女必须找个有内涵的人在
+一起证明自己不是花瓶。女性比男性更重视内涵，所以作者认为有内涵的男性还是有机会追到美女的。&lt;/p&gt;
+
+&lt;h2&gt;横刀夺爱的方法&lt;/h2&gt;
+
+&lt;p&gt;横刀夺爱的部分作者道出了男性的困境，好女人物以稀为贵，通常遇到好女人的时候都已经名花有主了。
+作者认为知道对方有男朋友的时候要一则以忧一则以 喜，忧的是对方已经有男友，喜的是女性在有
+男友的状态下换男友，条件通常不会太高，如果女性处在独身的情况下，对于男友的要求条件会比较高。&lt;/p&gt;
+
+&lt;p&gt;作者用工作比喻爱情，让人感到爱情其实是很脆弱的，工作的时候有时会遇到骑驴找马的情况，
+对目前的工作丧失工作热诚没有什么斗志，但一时之间又找不到更好的工作只好先维持现状。&lt;/p&gt;
+
+&lt;p&gt;爱情也有类似的情况，当两人之间的感情过了热恋期进入单调平凡的机械时期，就是最容易横刀
+夺爱的机会，只要能够证明自己比女方现任的男友好，就能够让女方动摇。&lt;/p&gt;
+
+&lt;p&gt;看到这边我心想“己所不欲，勿施于人” 横刀夺爱的事我是做不出来的，
+如果是我必定会等他们分手之后再进行攻略。接下来这种观念作者也提到，
+作者认为如果抱持等待的心态，最后必定会一事无成，因 为早就有其他人在旁边准备卡位，
+等到别人分手之后再想要有什么动作——已经太慢了。&lt;/p&gt;
+
+&lt;p&gt;本人认为通常横刀夺爱抢来的女友，也很容易被别人横刀夺爱抢走吧?  看完横刀夺爱的部分
+更知坚壁清野的重要性，女友的普通男性友人或是男友的普通女性友人，都不见得是“单纯”的角色，
+悍妇们一有风吹草动就会无理取闹，看到 黑影就开枪，并不无完全是无理取闹，也是要捍卫自己的幸福。&lt;/p&gt;
+
+&lt;p&gt;《爱情阴谋论》还有提到其他有趣的部分，这边就不再描述了。看完《爱情阴谋论》
+让人朝向有震荡器功能的玩具熊努力，“不定性”是维持爱情的要素，如果每天都过着相同的生活，爱情必定会出现裂痕。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>男人把妹7大错误【转载】</title>
+   <link href="http://tuohuang.info/seven-mistake"/>
+   <updated>2011-12-13T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/seven-mistake</id>
+   <content type="html">&lt;h2&gt;泡妞误区1：无条件付出&lt;/h2&gt;
+
+&lt;p&gt;与心仪女性刚刚认识的时候，男人往往喜欢无条件地为对方付出，管接送，管结账。男人尝试通过这些无条件的价值提供去“购买”和“说服”女人，希望她在理性层面上去接受他。问题是，男人却忽略了女性在感情层面上的感性思维。&lt;strong&gt;女性在一段关系中的感情体验，不在于她从一个男性身上得到了什么，而是在于她为这段关系付出了什么&lt;/strong&gt;。人只会在乎自己投入过的东西，男人经常忘记了这条人性法则。所以下次和女性约会，重点不是你为她付出什么，而是你怎么引导她去付出和投入。&lt;/p&gt;
+
+&lt;h2&gt;泡妞误区2：直接炫耀，却不懂得间接展示自身的软硬价值&lt;/h2&gt;
+
+&lt;p&gt;懂乐器，有好车和大房子，具有这些软和硬的价值都是非常棒的！但当你直接去炫耀这些闪光点的时候，问题就出来了。因为你需要她的认同，这是一种低价值男人才会做的事情。女人的社交触觉 本来就比男人敏感，她们可以轻易的察觉到男人的行为动机。争取她的认同是一种低价值的信息传递，男人会失去她的尊重。你不能像小狗一样通过摇尾巴来得到对 方的喜爱，你需要的不是认同，而是尊重。女人不会和一个她自己都不尊重的男人相爱。你需要学会如何通过间接的价值显示来吸引对方，把你的闪光点以间接的方
+法融入到你们的互动当中，让她不经意的察觉原来你有优秀。女人更愿意相信她自己发掘出来的东西！&lt;/p&gt;
+
+&lt;h2&gt;泡妞误区3：没有让女生合理化自己的兴趣&lt;/h2&gt;
+
+&lt;p&gt;男人对某个女性的兴趣，往往是由外表开始的。男人喜欢美女，进化心理学对此有一个非常合理的解释。那就是，男人在择偶的时候，更注重选择女性的繁殖能力， 看能不能通过和这个女人的结合去改良自己的基因。问题是，如果一个女人问你，你为什么喜欢她，而你却跟她很直白的说你只是喜欢她的外表的话，她是肯定不会接受的，哪怕你说的是真话！因为她知道她也会老，外表也会有退化的一天，这就意味着你对她的爱和资源投入会有终结的一天。你必须要让她相信，你是被她自身 特有特质而吸引，而且这些特质还必须是与她外表无关的内在美。确保你对她的爱和资源投入的持续性，是女人安全感的根本来源。&lt;/p&gt;
+
+&lt;h2&gt;泡妞误区4：需求感过强&lt;/h2&gt;
+
+&lt;p&gt;需求感指的是一方对另外一方的感情预期。你有没有试过因为该不该打电话给那个昨天刚认识的女生而忐忑不安呢？那感觉就是需求感过强的体验，因为你对她有了感 情预期。双方需求感的差异会引致双方不同的时间差。需求感相对较强的一方会觉得时间被拉长了，总是心神不宁地想和对方联系。也就是这样的原因，有些男人因为需求感过强而脑充血，隔三差五的给女生发短信打电话邀约。对他来说，因为时间观的拉长，让他觉得自己的行为没有问题，但在频频被骚扰的女孩子思维里，他的需求感会让她很不舒服。请控制你的需求感，别做那个急色的男人。&lt;/p&gt;
+
+&lt;h2&gt;泡妞误区5：过于形式，却忽略了根本&lt;/h2&gt;
+
+&lt;p&gt;男人在和女人打交道的时候，往往过于拘泥在形式上的展示，而不是把心思放在关系的核心，“人”，的本身。举个例子，很多男人在刚刚和一个女人约会的时候，会花大量心思去安排一顿大餐。但问题是，在他忙着向她展示出这个餐厅牛逼在哪里，该如何挑选和品尝红酒的时候，忽略了&lt;strong&gt;和女生的互动进行互动&lt;/strong&gt;。整顿晚餐变成了他自己一人的独角戏。钱花了，饭吃了，酒喝了，但是就是和女生没有进展。所以下次和女人约会，与其然花心思在“吃什么”和“在哪里吃”这些问题上，还不如花心思在两人的互动上。&lt;/p&gt;
+
+&lt;h2&gt;泡妞误区6：不懂及时升级&lt;/h2&gt;
+
+&lt;p&gt;升级可以指物理上（触摸、性、 等等）或者关系定位上（情人、男朋友、老公、等等）的升级。当一个女人愿意配合你的升级时，她的“升级窗户”即会打开。当她的升级窗户为你打开的时候，你不能犹豫，必须进入。不是的话，这扇窗会随着时间的转移而关闭。这扇窗户往往打开的时间很短，原因是升级窗户打开的时候，会让女人的情绪处于一种极度不稳 定的状态。这种不稳定的情绪会让她非常不舒服。随着时间的推移，她的情绪会逐渐理智下来，引致升级之窗的关闭。所以，男人啊男人，该下手的时候，请尊重 她，不要犹豫！&lt;/p&gt;
+
+&lt;h2&gt;泡妞误区7：追，而不是吸引&lt;/h2&gt;
+
+&lt;p&gt;你不能追女人，只能吸引她。“追”这一个概念包含着男方不平等、无条件的付出。男人追女人跑，一方付出一方获取，这种思维会限制你的求偶策略，让你陷入被动。相反，“吸引”强调的是男女双方平衡的投入和分享。追是一种物理概念，而吸引则是精神层面上的概念。所以只有吸引她，你才能冲击她的精神和灵魂，让她甘心跟随你的节奏。只有思维被纠正了，男人才能从被动转为 主导关系的一方。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://paoxue.com/thread-116819-1-1.html&quot;&gt;http://paoxue.com/thread-116819-1-1.html&lt;/a&gt;&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>男人如何主动【转载】</title>
+   <link href="http://tuohuang.info/how-to-be-active"/>
+   <updated>2011-12-13T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/how-to-be-active</id>
+   <content type="html">&lt;p&gt;最近的畅销书“我们都要性小康”的节选，作者也是国内性学界的翘楚了，不知他看过迷男方法没有，有些观点很有意思，特别是把“本我”“自我”“超我”来说事，经典。。。下面是节选《男人怎么主动》那一章&lt;/p&gt;
+
+&lt;p&gt;有一位“身经百战”的朋友，说他曾经与一个女孩子谈恋爱，谈了三个月，他要求抱抱或亲亲那个女孩子，结果人家不同意，他就跟人家掰了。没多久，对方告诉 他，她新见了一个男的，准备跟人家结婚。他问为什么这样快？她说因为跟他见面不到十分钟，就被他“那个”了，没有办法，只有嫁给他。这位朋友觉得这女的有 病，不可理喻，我倒觉得这中间道理很深。&lt;/p&gt;
+
+&lt;p&gt;男女之间怎样建立关系？怎样推进关系？对于青年男女，这是一门最重要的功课，许多人最大的疑惑就在这里。此处我把我个人的体会简单谈谈，或许可资借鉴。但我起点很低，天赋亦不高，所以是“抛砖引玉”。&lt;/p&gt;
+
+&lt;p&gt;第一，是观念问题。我有一个最大的问题：长期以来，我崇拜女人。尼采说，你去找女人吗？别忘了带上鞭子。他的观念当中有一个驯服意识，他是居高临下， 我是拜伏在地。从结果看，我的这个办法效率太差了。有女人告诫我说：“女人并非用来崇的。”这个意思，我很晚才领会到：米饭是用来吃的，不是用来理解 的；女人是用来爱的，并非是用来崇拜的。&lt;/p&gt;
+
+&lt;p&gt;什么是爱？爱包含着理解，却高于理解。理解是基础，但理解不是讲理。理解远远高于讲理，理解是通情达理，通情不是矫情，达理不是讲理。理解是姿态、心 态、态度。我虽不懂你，但我理解你。这个意思近于“我虽不赞同，但我能忍受”。我在三十多岁的时候还不懂这个道理，往往跟女人脸红脖子粗地讲理。结果可想 而知——凡是争论，则无胜方。理是达不成，更严重的问题在于它不能“通”情，反而使情“堵”住了。&lt;/p&gt;
+
+&lt;p&gt;前面讲到的这位老兄，他跟女方商量：我能抱你吗？我能亲你吗？他的发问和请求说明他不理解女人，不懂女人。要吻一个人，只需要她不反对，不需要她同 意。或者说，只要她心里同意，绝不要她口头赞同。男人要听得懂女人的语言，男人需要了解女人的三种语言方式：口头的、肢体的、潜意识的或者说心灵的、本能 的。这难道不是弗洛伊德的“三我”体现吗？本我，是生理层面的我，依快乐原则行事，基础是生物本能；自我，是心理层面的我，依现实原则行事，基础是理性判 断；超我，是社会层面的我，依理想原则行事，基础是理想境界。&lt;/p&gt;
+
+&lt;p&gt;女人嘴里说出来的话，是父母或社会要求附体在她身上说的，属于超我——理想当中的我，“应该”的我。所以很容易解释，女人嘴上说的与内心真实的想法往 往有很大差距。内心的真实想法，往往通过肢体语言表达出来，但是男人多半不懂得女人的肢体语言，这是一个大问题。有关常识网上不乏介绍得细致入微、剖析得 丝丝入扣的文章。&lt;/p&gt;
+
+&lt;p&gt;只有潜意识的、心灵的、本能的才是“本我”。有的男人已经高超到不与女人的超我、自我对话了，而是直接与她的本我对话，这当然是一针见血、一剑封喉的 功力了。他不会用蛮力，那不是最终的办法。这种办法我只是听说过，或在书中见到，现实中并没有见到谁在用。或者在现实中也是见过，但无任何美感可言了。尤其是看到双方都干柴烈火、急不可耐，猝然搞到一起。对这种情况，我并不意外，但我从中看到的只有必然，没有看到技术技巧，没有得到什么有益的启示。&lt;/p&gt;
+
+&lt;p&gt;第二，是技术问题。一个必须掌握的核心技术，就是你必须把意图与表现分开。什么意思？孔夫子讲，吾未见好德如好色者也。男人都好色，这是肯定的。10年前我甚至创造了一个词——好色如仇，这是从嫉恶如仇改过来的，希望能成为成语。好色没有问题，这是本质，但是好德是必须的。说白一点，男人应该做到意图 是好色的，但表现是好德的。&lt;/p&gt;
+
+&lt;p&gt;换句话说，做男人必须有层次——能够分清意图和表现，分得清上下、内外和表里。男人与女人交往，一定怀揣“不轨”，这是无可辩驳的。如果有哪个男人 说，他绝对没那个想法，那是信不得的。除非对方一无可取，或者碍于种种禁忌，否则有非份之想是在情理之中的。有一个做情感节目的女主持人告诉我，有个男的 非说自己是绝对的好男人，她偏不信，想逗逗他，结果她略微使了一点暧昧手段，他就把持不住了，说明他之前确实是吹牛。&lt;/p&gt;
+
+&lt;p&gt;男人有想法是对的，但是完全没有必要猴急猴急的、色迷迷的，让人一眼看出来，你不要紧盯着人家的双峰垂涎三尺。还有的男人给女人流里流气的感觉，轻薄 都写在脸上，看见就十分不爽，这就比猥琐男更不堪了。这样的男人不在少数，尤其是年轻时候，不够深沉老练，让人一眼看穿。与其这样，你还不如一脸死相呢！ 一脸死相，女孩子不会跟你亲近，但也不会轻易鄙视你。&lt;/p&gt;
+
+&lt;p&gt;有层次的男人懂得把自己的真实意图收敛起来，把眼光抬高三尺，从脐下抬到眉间。所有好色的意思，也都掩藏起来，言语、眉眼之间，令人如沐春风，却不曾 流露任何不雅的意思，但正因为如此双方都很兴奋，都感受到一种美好，留下许多回味，更留下许多想象空间。这个时候，前戏已经开始了。女人强调一切性都是基于情，这没有错。如果你一上来，眼神就如狼似虎，要剥光人家衣服似的，也许对那些开放前卫的女孩子有用，但对一般讲面子的中国女人，并不合适。&lt;/p&gt;
+
+&lt;p&gt;什么叫有层次？至少你得有两个层次，而不是一个。有点深度，有点纵深，这样的话，才有回味不是？这符合中国人的思维特性与生活方式。中国哲学讲阴阳， 一个人必须有阳的一面，还要有阴的一面，这叫空间，也叫回旋余地，这代表一个人的格局和胸怀。胸中有丘壑，涵养够深厚，才更值得期待。这种深度其实是女性 对于安全感的需求。女人不希望与她有私密关系的人是一个嘴巴不紧的家伙，所以她喜欢那种在人前光明磊落，在人后别有情调的男人。如果一个男人拿不出两个面 孔，始终只有一张脸，就难迎合女人对安全感的需求，不能满足她的隐私需要。&lt;/p&gt;
+
+&lt;p&gt;女人希望与她交往的男人是安全的。她不说安全感，她说安全。她说出来或者没有说出来的一句话就是：“你安全吗？”安全是什么意思？你以为她在讲安全 套？不是的。你以为她是在讲性病艾滋病？不是的。她是怕跟你做了，你不肯保密，甚至到处跟人炫耀。那她就傻了。因此上，民间总结得好：十个女人九个肯，就 看你嘴紧不紧。&lt;/p&gt;
+
+&lt;p&gt;有层次的第二个意思是能够有效推进交往层次。怎样认识？怎样打招呼？建立关系，是一个技术活儿，更是一个心理素质的考察。男人为什么羞涩？因为他总能 察觉到自己是心怀鬼胎，所以不能够理直气壮、大大方方地与人交谈。尤其是在见到漂亮女人的时候，还没有开口，先就气短了三分。如果克服了这个心理障碍，其余的问题就很简单了。建立关系，无非是要直截了当、阳光灿烂、热情洋溢，或者温文尔雅、谦和有礼地跟人打招呼。而后是要名片、记电话，如果双方感觉非常 好，当下就可以邀请吃饭，或者陪人家去逛街。&lt;/p&gt;
+
+&lt;p&gt;从不认识到认识，这算是上了一个台阶、一次质的飞跃，之后如何步步为营、层层递进？许多女人埋怨中国男人：磨蹭好几个月甚至好几年也不肯表白，粘粘乎乎、停滞不前，不知道他想要干什么？很不爽快。&lt;/p&gt;
+
+&lt;p&gt;我有一位兄长，人家给他介绍媳妇，两人一起逛街，结果回来的却总是他一个人。为什么？他一路不跟人说话，也不知道说啥好。此处要注意，口乃心之门户， 人的心里有什么？最深沉的是对人的爱，所以一定要表达。我欣赏你，我喜欢你，我情不自禁，我喜不自胜，我如坐春风，我欣喜若狂！另外还要用越来越强烈的方 式表达你对她的喜欢，所以说话交流很重要。你不说我怎么知道？要表达、要沟通，要点燃对方。如此一沟通，进展神速，只动嘴已经不够了，动手就很自然了。&lt;/p&gt;
+
+&lt;p&gt;如果你越来越喜欢她，你总要有所表达，这个关系自然而然地就往深层推进了。过马路的时候，要不要扶一把？下台阶的时候，要不要牵着手？送回家的时候， 临分手，是不是要轻轻抱一下？情不自禁的时候是不是要亲一口？连亲都亲了，其他的工作就都是顺理成章的事了。看看，这里边的顺序相当地符合逻辑，推进的层 次相当清晰。&lt;/p&gt;
+
+&lt;p&gt;前些年，我曾提出“性小康”概念，一半是戏谑，一半是当真。人的本质是关系，性的本质不会超出人的本质，所以我提出：性的本质是关系，性是关系的表达。我们了解关于性的规则、观念、技巧，目的全在于应用，用来干什么？&lt;/p&gt;
+
+&lt;p&gt;一方面是弥补“小时候”的渴求。 “小时候”太过饥渴，一旦逮到机会，一定要加倍弥补。这是“本我”起了主导作用，“超我”和“自我”在此处都丧失了功能。这种渴求，其实是对性信息的摄 取。人对性信息的需求是客观的，正如每分钟都需要呼吸空气一样，但是人类文明迄今对此的理解尚远远不够。&lt;/p&gt;
+
+&lt;p&gt;第二个方面是实现生活的乐趣。性是一件乐事，但是性又像火，人类文明的进步起于火，文明逐渐进步也伴随着人类对火控制水平的提高。从钻木取火到用煤、 石油、电、核能，若技术水平不配套，一个火星就能烧掉后院，谈什么核能？精通的目的全在于应用。当然，近些年坊间流行的说法是，家中红旗不倒，外面彩旗飘飘。我们不要急着打倒这个口号，细细品来，这里有好大的学问。&lt;/p&gt;
+
+&lt;p&gt;如果一个女人婚内足够幸福，她更容易原谅丈夫偶尔在外沾花惹草。一个主动的、有办法的男人是大能者，他能给与之相处的女人带来欢乐和幸福。如果他的“修身”到了更高的境界，他不但能给别人带来幸福，还能保障自己的幸福，因为幸福总是首先到别人那里，之后才轮到自己。应用来干什么？说到底，还是建立或处理关系。性的本质是关系，而关系的本质是什么？关系的本质是性，这是循环解释了。但这个循环就是宿命，几乎逃不掉 的。平常我们说，那两人有没有关系？只要是一男一女，毫无疑问，我们指的就是性。换句话说，性是人类关系的核心。如果男人不会处理这个关系，他一定难以获得自由。女人与他相处，随时要提防小心，也会太累。性是智慧之门，若不是你做它的主，就会让它做了你的主。为什么会出现禁欲的哲学？这也是一种办法：我彻 底地与你一刀两断，看你如何干扰我？所以我认为禁欲的本质是求自由，但是能把这条路走通的人万中无一，绝大多数人应该走另一条路。&lt;/p&gt;
+
+&lt;p&gt;现今社会还有许多人对这个问题没有脱敏，自己营造地狱，也给他人设置牢笼。有的女人看起来很保守、很传统，其实心里相当敏感，随时随地担忧老公出轨， 时时刻刻盘查，人为制造牢狱。这一处“暗疮”实在恶毒，这实在是莫大的悲哀和耻辱。女人是如此，男人也是如此。这是一个痛处，就是佛家所说的“痴”，即是执着。虽嘴上不说，但心里每刻惦记的就是这个事。可见，伪君子远远不只是男人，女伪君子可能更多。这也说明处理男女关系的难度之大。&lt;/p&gt;
+
+&lt;p&gt;相比之下，亲密倒是一件极其简单的事了。我现在愈加相信亲密越来越容易，下床虽比亲密难一点，但总体来说还是比过去容易处理。过去连避孕套都没有，控 制结果该有多难！现代器物、观念、通讯、价值评价都比过去强了无数倍，若是人们依然无法获得性福，达不到性小康，岂不是废物点心？&lt;/p&gt;
+
+&lt;p&gt;为什么说现在亲密容易了？既然说到这里，就不妨再多说两句。亲密更容易了，因为女性更解放了，女性在观念上更清晰了。她们知道，没有多少爱非要通过性 来表达，反过来说也是一样：又有多少性非要通过爱来做呢？这两句话都有点拗口。说明白一点，即是说现代女性每一次TD越来越能分清她是为爱而做，还是为性 而做，还是为了别的什么。&lt;/p&gt;
+
+&lt;p&gt;如今的女人对于性的态度大变，尤其是过去的所谓LJ妇女、贤淑女孩。她们仿佛是外表越文静、越保守的，往往内心越躁动，做法越惊人，而且有一种现象特 别耐人寻味：在性上，有些女人只对丈夫或男友矜持。这也许是因为只有男友和老公才需要她保守和矜持，其他男人不需要这种态度。与之相应，她便以更加主动、真实的一面回报他或他们。这倒也好理解：哪个女人没有前生后世呢？哪个女人的内心不像男人一样，
+对性有着丰富的想象和奇特的期待呢？&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>77 Laws of Success with Women & Dating</title>
+   <link href="http://tuohuang.info/77-laws-of-success-with-women-and-dating"/>
+   <updated>2011-12-13T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/77-laws-of-success-with-women-and-dating</id>
+   <content type="html">&lt;p&gt;From the &lt;strong&gt;&lt;em&gt;Double Your Dating&lt;/em&gt;&lt;/strong&gt; series by David DeAngelo.&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Accept everything the way it is.&lt;/li&gt;
+&lt;li&gt;Take responsibility.&lt;/li&gt;
+&lt;li&gt;Go to work on yourself, not on women.&lt;/li&gt;
+&lt;li&gt;Evict your Inner Wussy.&lt;/li&gt;
+&lt;li&gt;Build a powerful, capable self-image that you love.&lt;/li&gt;
+&lt;li&gt;Move your frame of reference inside.&lt;/li&gt;
+&lt;li&gt;Stop making identity meaning out of external events.&lt;/li&gt;
+&lt;li&gt;Eliminate failure by learning from it.&lt;/li&gt;
+&lt;li&gt;Compare your progress and success only to yourself, not to others.&lt;/li&gt;
+&lt;li&gt;Evolve constantly and consciously - always seek the next level and paradigm.&lt;/li&gt;
+&lt;li&gt;See yourself as &amp;quot;high status.&amp;quot;&lt;/li&gt;
+&lt;li&gt;Stop apologizing.&lt;/li&gt;
+&lt;li&gt;Stop seeking approval.&lt;/li&gt;
+&lt;li&gt;Stop giving approval in order to get it.&lt;/li&gt;
+&lt;li&gt;Stop trading status for approval.&lt;/li&gt;
+&lt;li&gt;Untangle past, present and future...physical, logical and emotional...short, 
+medium and long-term gratification...fear of something and the actual event...
+and other non-useful combinations.&lt;/li&gt;
+&lt;li&gt;Surround yourself with success models, whether they be in person, in books, on audio or on video.&lt;/li&gt;
+&lt;li&gt;Know your purpose or path in life, and stay on it.&lt;/li&gt;
+&lt;li&gt;Travel.&lt;/li&gt;
+&lt;li&gt;Every day, find your center, become centered, then make yourself the center.&lt;/li&gt;
+&lt;li&gt;Focus on the core skills and your inner game, and the techniques will take care of themselves.&lt;/li&gt;
+&lt;li&gt;Accept and embrace transition anxiety as an opportunity to see things from a 
+beginner's perspective automatically.&lt;/li&gt;
+&lt;li&gt;Learn to enjoy the process of learning more than the actual result of the learning.&lt;/li&gt;
+&lt;li&gt;Teach others every great thing you learn immediately.&lt;/li&gt;
+&lt;li&gt;Never whine, bitch or complain...Ever.&lt;/li&gt;
+&lt;li&gt;Objectify your demons so you control them instead of them controlling you.&lt;/li&gt;
+&lt;li&gt;Become selfish so you can become generous.&lt;/li&gt;
+&lt;li&gt;Surround yourself with success models, while eliminating failure models.&lt;/li&gt;
+&lt;li&gt;Keep doing what works and stop doing what doesn't work.&lt;/li&gt;
+&lt;li&gt;Maintain your composure.&lt;/li&gt;
+&lt;li&gt;Prove to yourself over and over that you can deal with &amp;quot;rejection.&amp;quot;&lt;/li&gt;
+&lt;li&gt;Learn to sacrifice short-term gratification for long-term success.&lt;/li&gt;
+&lt;li&gt;Learn how to always enjoy yourself, no matter what's happening around you.&lt;/li&gt;
+&lt;li&gt;Value yourself and your time more than any woman.&lt;/li&gt;
+&lt;li&gt;Develop your awareness.&lt;/li&gt;
+&lt;li&gt;Learn to control your emotions.&lt;/li&gt;
+&lt;li&gt;Become unbelievably honest, authentic and blunt when it's time to be direct.&lt;/li&gt;
+&lt;li&gt;Learn to identify social status by communication and body language instantly.&lt;/li&gt;
+&lt;li&gt;Become an expert on your own self-deception habits.&lt;/li&gt;
+&lt;li&gt;Balance learning, practicing and doing.&lt;/li&gt;
+&lt;li&gt;Constantly improve yourself.&lt;/li&gt;
+&lt;li&gt;Stop projecting your strengths and weaknesses onto others.&lt;/li&gt;
+&lt;li&gt;Eliminate destructive or negative habits and replace them with positive, useful ones.&lt;/li&gt;
+&lt;li&gt;Recognize when you're losing control of yourself and stop.&lt;/li&gt;
+&lt;li&gt;Make your territory yours.&lt;/li&gt;
+&lt;li&gt;Lead.&lt;/li&gt;
+&lt;li&gt;Stop idealizing women.&lt;/li&gt;
+&lt;li&gt;Stop idealizing relationships.&lt;/li&gt;
+&lt;li&gt;Let her problems be her problems.&lt;/li&gt;
+&lt;li&gt;Don't try to control her by supporting her or giving her money.&lt;/li&gt;
+&lt;li&gt;Stop trying to impress women.&lt;/li&gt;
+&lt;li&gt;As you learn, pay careful attention to every detail of your personal hygiene, dress, 
+style, posture, voice tone...until it has reached the level of &amp;quot;unconscious competence.&amp;quot;&lt;/li&gt;
+&lt;li&gt;Eliminate every nervous tick, gesture, facial expression and unconscious response to challenges from women.&lt;/li&gt;
+&lt;li&gt;Make yourself into the most interesting person a woman has ever met.&lt;/li&gt;
+&lt;li&gt;Set up your life so you're constantly meeting interesting, attractive, available women automatically.&lt;/li&gt;
+&lt;li&gt;Behave as if you have 100 women calling you every day.&lt;/li&gt;
+&lt;li&gt;Don't behave in a boring or predictable way.&lt;/li&gt;
+&lt;li&gt;Learn how to tell an interesting story about anything.&lt;/li&gt;
+&lt;li&gt;Learn how to use Cocky Comedy.&lt;/li&gt;
+&lt;li&gt;Make friends with attractive women by becoming a guy that women like to be around.&lt;/li&gt;
+&lt;li&gt;Learn how to turn a woman on mentally, emotionally and physically.&lt;/li&gt;
+&lt;li&gt;Learn the entire mating process of humans in detail.&lt;/li&gt;
+&lt;li&gt;Learn how to read situations before acting or communicating.&lt;/li&gt;
+&lt;li&gt;Tease...in every way.&lt;/li&gt;
+&lt;li&gt;Be honest, ethical and authentic always.&lt;/li&gt;
+&lt;li&gt;Set a boundary as soon as possible.&lt;/li&gt;
+&lt;li&gt;Look past the content to see the true meaning of what's going on.&lt;/li&gt;
+&lt;li&gt;Engage her emotions and body, not her mind.&lt;/li&gt;
+&lt;li&gt;Turn everything into an adventure.&lt;/li&gt;
+&lt;li&gt;Convince yourself that what's about to happen is going to be unbelievably fun, then convince her of it.&lt;/li&gt;
+&lt;li&gt;Always act and communicate in a way that leaves her wanting to know more, feel more and do more.&lt;/li&gt;
+&lt;li&gt;When you hit a challenge or a setback, go back to the basics.&lt;/li&gt;
+&lt;li&gt;When you find yourself losing a woman, stop, step back and wait until she comes to 
+you - pull the needle out of your arm immediately.&lt;/li&gt;
+&lt;li&gt;Always have three female friends around you that are very similar to the type of
+woman you want to meet.&lt;/li&gt;
+&lt;li&gt;When you find something she really likes, stop, pull back and make her really want
+it before you tease her with it a little more.&lt;/li&gt;
+&lt;li&gt;Learn how to make conversations interesting for women.&lt;/li&gt;
+&lt;li&gt;Learn what it means to be a &amp;quot;Renaissance Man,&amp;quot; and become one.&lt;/li&gt;
+&lt;/ol&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>kvo的《无童话，不把妹》</title>
+   <link href="http://tuohuang.info/tale-and-pua"/>
+   <updated>2011-12-12T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/tale-and-pua</id>
+   <content type="html">&lt;p&gt;转载自：&lt;a href=&quot;http://meilike.org/forum.php?mod=viewthread&amp;tid=469&quot; title=&quot;魅力客&quot;&gt;魅力客论坛&lt;/a&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;我愿变成童话里
+你爱的那个天使
+张开双手变成翅膀守护你
+你要相信
+相信我们会像童话故事里
+幸福和快乐是结局
+        ——光良《童话》
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;每个人心中都有着对童话世界的向往与偏爱。那既是我们对平淡生活的超脱，又是我们再也回不去的童年。&lt;/p&gt;
+
+&lt;p&gt;谁不喜欢浪漫呢？一直以来，童话都是浪漫的重要元素之一。尤其女孩，更是对童话偏爱有加。
+其实每个人都做过关于自己的公主、王子梦。把梦境带回给他们，在他们的梦境中与他们一起分享一段美好的时光。
+我喜欢在对话中引入、套用一些童话的场景。这样做要么让对话变得生动有趣，要么透出内心深处一缕浪漫的气息。
+经常自然而然地和交流的对方进入了角色扮演的游戏，两个人玩得不亦乐乎。&lt;/p&gt;
+
+&lt;p&gt;记得大学时候，在机房上网。身后有个很漂亮的女生，正好我要抄新课表没带笔，于是管她借。
+结果没一会儿，她接了个电话，匆匆忙忙就走了，把笔忘在了我这。我通过机房管理员查到了她班级和学号，
+又找到她们学院办公室，要到了她们班班长的电话，再假借学院名义让班长把她电话给我，说学院有事找她。
+打给她后，我这样开始了我们的对话：“灰姑娘在国王的舞会上匆匆忙忙就走了，王子拿着她遗落的圆珠笔终于找到了她……”&lt;/p&gt;
+
+&lt;p&gt;还有一次，是在夜店里，和一个姑娘一直聊到天亮。她开始犯困。她姐们却玩意正酣不想立刻走。
+于是她坐在那里闭目养神、昏昏欲睡。我轻拍她，让她睁眼，在她耳边说了一句话：“不要睡着哦，
+否则会发生一个童话故事”。她疑惑地看着我，问什么故事。“王子吻醒了公主，两个人从此过上了幸福快乐的生活。”
+我坏坏地告诉她。&lt;/p&gt;
+
+&lt;p&gt;再说个例子。一个我不很熟的女孩手机换号了，没告诉我。
+我从她朋友那要到了她新号码打给她。她说自己手机丢了，正好有个不错的连号，就改用新号了，
+不过之前的电话薄好多都没恢复出来，问我怎么找到她新号的。我说我捡到了一个油灯，
+一擦，从里面出来一个魔鬼，说可以满足我任何要求，我就让他把你现在的手机号告诉我了。
+又有一次，我在网上和女孩聊QQ。聊着聊着就到午夜十二点了。我跟她说：“十二点了，你该下线了”。
+她问为什么。我说：“过了十二点还不下线，美丽的公主就会变回灰姑娘了”。&lt;/p&gt;
+
+&lt;p&gt;像这样的故事有很多，有些是事先按照童话这个既定的方向想出来的，有些是现场随机应变出来的。
+但无论事先还是临场，有件事情你必须明白——如果不是发自内心地热爱生活，
+仅仅靠钻研推演魅力学技术是不可能让一个人拥有诗情画意的浪漫情怀的。
+多拿出一些时间去培养自己的品味，在音乐、艺术等等领域不断汲取养分。
+有一句话我很喜欢：爱生活如濒死，求大道若永生。把每一天都当做生命的最后一天去活着，
+这样的生活才精彩、才浪漫。有了浪漫的情怀与生活，与别人相处时自然有无限灵感涌现在脑海。
+其实每个热爱生活的人本身就是在演绎着一场关于生命的童话。&lt;/p&gt;
+
+&lt;p&gt;无童话，不把妹。热爱生活，喜爱童话吧。喜欢童话的孩子都不坏，
+会有一段星梦奇缘在命运的某个角落等待着他们……&lt;/p&gt;
+
+&lt;p&gt;提示：配合着“心有猛虎，细嗅蔷薇”的心境去使用，效果更佳！面对残酷的生活，你勇猛、坚强，
+但却依然在内心深处保留着那一份孩子般的纯真&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;“你可以不高，不帅，不够有钱。不够幽默，但是~，但是，你不可以不浪漫”
+                                                --《第一次亲密接触》。
+&lt;/code&gt;&lt;/pre&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>关于kino的经验</title>
+   <link href="http://tuohuang.info/about-kino"/>
+   <updated>2011-12-12T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/about-kino</id>
+   <content type="html">&lt;p&gt;昨天跟小华聊了一下，下面都是他的实践经验&lt;/p&gt;
+
+&lt;h2&gt;kino的魔力&lt;/h2&gt;
+
+&lt;p&gt;女生被有好感的男生kino后，就开始更有好感了。态度大变。&lt;/p&gt;
+
+&lt;h2&gt;kino的局限性&lt;/h2&gt;
+
+&lt;p&gt;但是kino了之后，也不一定你们就可以成为男女朋友。女人对kino的容忍度比男人想象的要大。手也牵了，也拥抱了，也不能说明你们就是男女朋友了。就算Kiss了，也不一定是。更有甚者，就算是TD了，也不能说你们就是男女朋友关系。所以kino只是必要非充分条件，并且kino要一步步升级，还要伴随着感情的交流。&lt;/p&gt;
+
+&lt;h2&gt;要有借口&lt;/h2&gt;
+
+&lt;p&gt;但是一定要有借口，比如，一起过马路牵她的手，一起从电梯出来揽她的腰，注意：手放上去就不要放下来了。&lt;/p&gt;
+
+&lt;h2&gt;得寸进尺 循序渐进&lt;/h2&gt;
+
+&lt;p&gt;说的是，kino要从无意到有意，从不敏感的地方到敏感的地方，逐渐亲密。一旦到了这步，就要考虑下一步如何kino到更高级别。&lt;/p&gt;
+
+&lt;h2&gt;牵手要有力&lt;/h2&gt;
+
+&lt;p&gt;她一开始会试图挣脱，那都是正常的，你就要不放手，要强硬。就算被挣脱，再来。直到驯服她。&lt;/p&gt;
+
+&lt;h2&gt;她是在等我抱她吗？&lt;/h2&gt;
+
+&lt;p&gt;我有个问题要问了，我送小白到楼下，我转身走，回头看看，她还在那里，她是在等我有所行动吗？&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>电影《蔓延》</title>
+   <link href="http://tuohuang.info/the-movie-spread"/>
+   <updated>2011-12-11T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/the-movie-spread</id>
+   <content type="html">&lt;p&gt;&lt;a href=&quot;http://movie.douban.com/subject/3011044/&quot;&gt;&lt;img src=&quot;http://img3.douban.com/mpic/s3836008.jpg&quot; alt=&quot;蔓延&quot;&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;今天宅在家里看日剧看电影，看了电影《蔓延》。《蔓延》的另一个名字叫《情圣终结者》。
+故事讲的是住在美国洛杉矶的一个帅哥，天生好手，靠吃软饭度日，后来遇到了个女PUA，最后他爱上了她。
+女PUA说要去纽约跟未婚夫分手，却没有回来。男主角下定决心要把她追回来，奔赴纽约向她表白。
+但是最终他们没有在一起，女PUA还是嫁给了纽约的有价钱人。
+好吧，让中国导演来拍的话，肯定是个有情人终成眷属的结局。&lt;/p&gt;
+
+&lt;p&gt;片中男主角的肢体语言，以及调情的语言值得学习，他话不多，但是有张力。
+关于搭讪，他说：“搭讪只需要一句话，其他都是多余的”。
+他的开场白就一句话，你叫什么名字？然后，就blablabla。。。&lt;/p&gt;
+
+&lt;p&gt;没想到泡学上也有别人发现了这部片子，请看&lt;a href=&quot;http://paoxue.com/thread-88943-1-1.html&quot; target=&quot;_blank&quot;&gt;评论&lt;/a&gt;。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>好男人病毒作怪</title>
+   <link href="http://tuohuang.info/oh-nice-guy-virvus"/>
+   <updated>2011-12-11T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/oh-nice-guy-virvus</id>
+   <content type="html">&lt;p&gt;再这样下去恐怕不行啊。昨天和小白看完话剧回来，一路上看月亮，后来我们一起在她家楼下的甜品店看月亮，聊天。
+她聊到了感情的话题，但是我却没继续下去，我在干什么啊，就顾着自己说话说得爽，忘了我的任务是什么。
+kino方面有进步，进到漆黑的剧场时，我拉着她的胳膊进场。好吧，为什么不是拉手呢，因为胳膊好拉嘛。
+她的反应嘛，没有反应，看来是比较习惯了。&lt;/p&gt;
+
+&lt;p&gt;上次去东四那边的时候，在地铁里，我就拉她到靠扶手近的地方，我看到她偷偷地笑了，呵呵。幸福的吧。
+下次约她去五道口那边的AT舞会，带她跳舞。我的目标就是，让她体会这些不曾体会的东西，然后，说些煽情的话。&lt;/p&gt;
+
+&lt;p&gt;我还是太绅士了，适当坏一点吧，想想这时候小华会怎么做呢。我和她都认识快2个月了，每次约她都能出来，
+证明她对我还是很有好感的。&lt;/p&gt;
+
+&lt;p&gt;下次约会要注意的事：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;多谈一下感受，对她的看法&lt;/li&gt;
+&lt;li&gt;该是有意kino的时候了，女人关注的世界是“她和我”&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;来吧，不试试怎么知道呢，永远当好人是没有用的！！&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>新的突破</title>
+   <link href="http://tuohuang.info/new-break-through"/>
+   <updated>2011-12-05T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/new-break-through</id>
+   <content type="html">&lt;p&gt;昨天跟朝阳MM约会，吃了饭，看了电影，送她回家，到她家楼下，我恋恋不舍
+最后抱了她，她也很配合，看来这是水到渠成的。&lt;/p&gt;
+
+&lt;p&gt;哎，一年了，认识整整一年，之前我是有GF，而且我又没有双线作战的经验，另外她工作也忙
+就一直拖着，就这样拖着也都没有拆散我们，看来真是天意啊。&lt;/p&gt;
+
+&lt;p&gt;MM这周可能就换工作了，公司在中关村这边，以后可以有更多机会见面了。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>女人都喜欢暧昧</title>
+   <link href="http://tuohuang.info/A-post-from-smth"/>
+   <updated>2011-12-02T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/A-post-from-smth</id>
+   <content type="html">&lt;p&gt;今天看到水木Love版有这个帖子&lt;/p&gt;
+
+&lt;blockquote&gt;
+发信人: fuxun (付迅是也！), 信区: Love&lt;br /&gt;
+标  题: MM朋友求助分析&lt;br /&gt;
+发信站: 水木社区 (Fri Dec  2 00:03:02 2011), 站内&lt;br /&gt;
+&lt;br /&gt;
+她有男朋友，但是家里反对，朋友也不是很赞成，毕竟那男的木有工作，搞网店搞网站的。不过她男朋友为了她去考公务员，考省会城市（他们是县里的）总分排名第二，没戏了。。。。去面试前一天，她为她男朋友一个人跑老高的山上去祈祷拜佛，知道他面试没面上很伤心。。。&lt;br /&gt;
+&lt;br /&gt;
+过了半个月，在一次高中同学婚礼上见到一个男生对她的眼神充满关爱，KTV还牵她的手，K歌后，她送男生回家，被男生强吻了。她发现很喜欢这个男生爱抚她的额头和后脑勺的感觉，觉得很是被呵护。&lt;br /&gt;
+&lt;br /&gt;
+第二天，男生约她去喝咖啡，她也去了，不过她很伤心，喜欢上男生的笑容，感觉对不起自己的男朋友。然后她就告诉她男友了，她男友很生气，第三天白天消失了，还把她QQ拉黑了；她很难过，在QQ漂流上写“大熊走了”（她叫自己男朋友大熊）。。。收到一个陌生回复：大熊会回来的。接着晚上男生给她电话，问她在哪儿，她说在外面瞎逛，于是男生过来找她，她竟然喜欢和男生逛街的感觉，和男生却不能正大光明逛街，怕被人看到。&lt;br /&gt;
+&lt;br /&gt;
+他们逛到晚上12点多，男生送她回宿舍却被她男朋友堵住了，她男朋友对男生说是她的男朋友。。。&lt;br /&gt;
+&lt;br /&gt;
+第四天男生给她发暧昧短信，叫她猪，叫她乖乖，说她欠了男生两个吻。。。在QQ上也开始发拥抱 飞吻等表情。她男朋友看到了 很生气 就跟用她的QQ跟男生说 不要骚扰他们 可是男生回了说她不承认她有男朋友。。。。&lt;br /&gt;
+&lt;br /&gt;
+现在她很乱 不知道该怎么办。。。。&lt;br /&gt;
+&lt;br /&gt;
+童鞋们帮忙分析一下吧。。。。。&lt;br /&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;看到了吧 眼神流、kino，第二天就邀约，暧昧升级…… 此男就是PUA啊，此女生有男友，照样跟别的男人暧昧。女人都喜欢暧昧，即使是有男友的，有老公的。对她们来说，这是生活的调剂。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>噩梦</title>
+   <link href="http://tuohuang.info/nightmare"/>
+   <updated>2011-11-28T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/nightmare</id>
+   <content type="html">&lt;p&gt;今早是在梦中惊醒的。梦中我遇到了一位女孩，我对她很有感觉。我和她在公交车上相遇，和她聊天，一起下车，上了一栋大楼。
+可惜，几个小时（《盗梦空间》里说梦中的一秒是真实时间的几十倍）之后，她跟我说了声Good bye，就冲出向大楼的窗户，一跃而下。&lt;/p&gt;
+
+&lt;p&gt;我伤心欲绝，咆哮着，哭喊着，然后我就醒了。&lt;/p&gt;
+
+&lt;p&gt;醒后我努力回忆，不要让自己忘掉这个梦，结果还是忘了许多细节。&lt;/p&gt;
+
+&lt;p&gt;能记起的大部分是懊悔，我应该告诉她，我喜欢你，想和你在一起。如果我这么说了，
+不会发生后面的事了吧。&lt;/p&gt;
+
+&lt;p&gt;现实中这种事经常发生啊，你明明喜欢人家，但是就是不表达，也许两个人就这样擦肩而过，
+这辈子再也见不到了，这和阴阳相隔有什么区别。&lt;/p&gt;
+
+&lt;p&gt;现在说的，和是否被拒绝无关，你表达对别人的喜欢，人家也会开心，可以给别人带来希望，不是吗？&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>女人的性需求（转载）</title>
+   <link href="http://tuohuang.info/women-sex-demand"/>
+   <updated>2011-11-27T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/women-sex-demand</id>
+   <content type="html">&lt;p&gt;女人与男人一样，具有心理与生理的需求，并交织在一起。不同的年龄段、不同的特性、所处不同背景，
+其生理与心里需求的强度不一致的。&lt;/p&gt;
+
+&lt;h2&gt;1、年龄、心理与生理需求&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;青春年少，18-23岁之间，心理需求大于生理需求。如果想与你亲密，也是心理好奇。如何激发其好奇心，对性的好奇心是关键。&lt;/li&gt;
+&lt;li&gt;23-27岁，心理需求与生理需求平衡期。需要有感觉的性，玩的爽的性，富有质量的性。如何挖掘对你生理、 心理的好感是关键。如果不够帅气，搞这个年龄段的女人就需要财气或才气。&lt;/li&gt;
+&lt;li&gt;28-35，生理需求大于心理需求。如何激发生理需求并寻求合适的机会和场所是关键。&lt;/li&gt;
+&lt;li&gt;36岁以上-绝经之前，全各位粟友别弄了。如果你本事大，也行，哈哈哈。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;2、特性与需求&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;外表特征方面，请看面相有关的书籍，提供很多有关性欲是否发达的信息。&lt;/li&gt;
+&lt;li&gt;内在特征方面，需要在沟通交流中进行把握。主要关注其对爱情、性、婚姻、一夜情的看法。无所谓，就放得开，  敢谈就可能敢干。斥责你的，基本上无戏。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;3、所处背景&lt;/h2&gt;
+
+&lt;p&gt;了解人的背景，也就了解和推测了需求满足程度。&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;单身，即无朋友无老公，或自己宣称单身的，心理和生理自然都有需求。可根据所处年龄以及特征进行判断。&lt;/li&gt;
+&lt;li&gt;有男朋友。看其男朋友是否在身边；同时结合其特征进行判断。在身边，并好色者，也可能会跟你来一夜潇洒。
+更何况不在身边又要色者或喜欢刺激者？&lt;/li&gt;
+&lt;li&gt;结婚无孩子。双方2地是美好机会；情感不好，也是美好机会。并且，方便出来与你共度良宵。&lt;/li&gt;
+&lt;li&gt;结婚有孩子。如果与其老公在一起，孩子也不是很大，你基本上没机会，快闪。如果与老公不在一起，
+你的机会就多一些，那要看孩子是其自己照顾还是别人帮助，别人帮助，白天的机会大，自己照看，晚上的机会大。&lt;/li&gt;
+&lt;li&gt;离婚的女性。无论是否有孩子，需求是大大地。如果对你不反感，你的机会就大大地。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;以上对女人需求的判读需要综合进行。 需求是根本。如果没有需求，你怎么激发也无用。
+需求强度大而得不到满足的时候，稍微诱发就可以搞定；需求强度大但有所满足或条件约束时，就难以激发。&lt;/p&gt;
+
+&lt;p&gt;追求TD的过程，也是寻求需求匹配的过程，把自己卖给对方，也把对方卖给自己。互惠互利、
+需求互补是前提。判断需求、把握需求，是进行TD的第一步。需求把握技巧是基础性的，与选择技巧联系在一起。知道销售中的漏斗理论吗？销售漏斗，就是广泛猎取，需求把握和筛选，再进行下一步的精细行动。&lt;/p&gt;
+
+&lt;p&gt;如何走入对方内心、如何挖掘和激发对方的需求，那是需求把握的更高层级，但不是每一个人都能达到的。就如在市场营销的各类人员，高低都有。看你的修炼了。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>6招快速提升安全感</title>
+   <link href="http://tuohuang.info/6-ways-to-increase-your-sense-of-security"/>
+   <updated>2011-11-26T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/6-ways-to-increase-your-sense-of-security</id>
+   <content type="html">&lt;h2&gt;一、小范围地冒一冒险&lt;/h2&gt;
+
+&lt;p&gt;特蕾莎修女说：上帝不是要你成功，他只是要你尝试。&lt;/p&gt;
+
+&lt;h2&gt;二、远离那些太容易获得的安全感&lt;/h2&gt;
+
+&lt;p&gt;一是说条件太好了很难成功，
+二也是说长期都做让自己感觉舒适的事，局限于舒适区，很难有进步。&lt;/p&gt;
+
+&lt;h2&gt;三、珍爱生命，远离恐惧&lt;/h2&gt;
+
+&lt;h2&gt;四、做一个恐惧保险箱&lt;/h2&gt;
+
+&lt;h2&gt;五、做成功日志，你就成为牛人&lt;/h2&gt;
+
+&lt;h2&gt;六、面对恐惧，触底反弹&lt;/h2&gt;
+
+&lt;p&gt;这就是我前面的博文&lt;a href=&quot;http://impua.info/2011/11/24/face-to-fears.html&quot;&gt;面对恐惧&lt;/a&gt;的内容了。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>面对恐惧</title>
+   <link href="http://tuohuang.info/face-to-fears"/>
+   <updated>2011-11-24T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/face-to-fears</id>
+   <content type="html">&lt;p&gt;也是从《拆掉思维的墙》里面看来的，说《面对恐惧，从容面对》（&lt;em&gt;Feel the Fear And Do It Anyway&lt;/em&gt;）中说
+恐惧有三个层次：&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;第一个层次是恐惧事情本身&lt;/li&gt;
+&lt;li&gt;第二个层次是害怕失去背后的价值&lt;/li&gt;
+&lt;li&gt;第三个层次，也就是真正的恐惧，是你觉得自己没能力去应对这个失去。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;因此，当我们是AFC的时候，对女人过于顺从，过于讨好，又不敢去kino，是因为害怕失去机会，但是转念想想，
+你不去Kino，不也是没机会了吗？陷入友谊圈里，你要她何用，你需要那么一个女性朋友吗？不需要，
+如果她只是你的女性朋友，你们可能一年才见一次面，吃个饭看个电影就要等半年或者一年才能见到，或者永远都见不到了。&lt;/p&gt;
+
+&lt;p&gt;那为什么不试试呢，这样，即使失去了，也顶多被她认为好色而已，再说你们都那么熟了，她不会当你好色的。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>男人不坏，女人不爱</title>
+   <link href="http://tuohuang.info/women-love-bad-guy"/>
+   <updated>2011-11-23T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/women-love-bad-guy</id>
+   <content type="html">&lt;p&gt;&lt;a href=&quot;http://book.douban.com/subject/5993316/&quot;&gt;&lt;img src=&quot;http://img1.douban.com/mpic/s6309852.jpg&quot; alt=&quot;男人不坏女人不爱&quot;&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;昨天开始重读郑匡宇的《男人不坏，女人不爱》（这是大陆名，台湾那边叫《坏男人养成帮》）。&lt;/p&gt;
+
+&lt;h3&gt;信念1 爱人之前先爱己&lt;/h3&gt;
+
+&lt;p&gt;其实就是强调，不要指望靠讨好女生来换取她对你的青睐。好人相信爱别人要比爱自己多，
+以女人的快乐为自己的快乐。坏男人相信爱别人前要先爱自己，绝对不会做出违背自己原则的事。&lt;/p&gt;
+
+&lt;h3&gt;信念2 坏男人有人爱&lt;/h3&gt;
+
+&lt;p&gt;好人对女生的付出，不求回报而且无怨无悔，坏男人不做没有效益的付出，对女生献殷勤，都是要有回报的。&lt;/p&gt;
+
+&lt;h3&gt;信念3 有一种自信叫自以为是&lt;/h3&gt;
+
+&lt;p&gt;好人过分在乎女生对自己的感觉，患得患失，
+坏男人一幅“我就是这样，不然你想怎样”的态度，反而让女生对他好奇，产生兴趣。&lt;/p&gt;
+
+&lt;h3&gt;信念4 你才是世界的中心&lt;/h3&gt;
+
+&lt;p&gt;好人缺乏自信，把女人当成是世界的中心，坏男人充满自信，把自己当成是世界的中心。&lt;/p&gt;
+
+&lt;h3&gt;信念5 走自己的路，让女人去急&lt;/h3&gt;
+
+&lt;p&gt;好人把女人对他的负面态度全部当真，然后觉得天就要塌下来了；
+坏男人把女人的负面态度甚至批评全部当成耳边风，继续自以为是。&lt;/p&gt;
+
+&lt;h3&gt;信念6 小心！好人陷阱&lt;/h3&gt;
+
+&lt;p&gt;好人容易被女生耍，对方稍微善意回应一下，就以为自己有希望，然后义无反顾地把女孩子捧上天；
+坏男人相信和女孩子相处时，不用把她说的好话当真，还要小心对方设下让他成为好人的陷阱。&lt;/p&gt;
+
+&lt;h3&gt;信念7 要让公主看上你，先要让自己成为王子&lt;/h3&gt;
+
+&lt;p&gt;被女人拒绝时，好人相信一定是自己哪里做错了，坏男人会认为那一定是对方的问题。&lt;/p&gt;
+
+&lt;h3&gt;信念8 算算你的付出回报率&lt;/h3&gt;
+
+&lt;p&gt;好人倾向于一直付出，因为他们以为付出就会有回报，坏男人懂得设置停损点，壮士断腕。&lt;/p&gt;
+
+&lt;h3&gt;信念9 表现自我优势&lt;/h3&gt;
+
+&lt;p&gt;好人在追求女生的时候，容易畏畏缩缩的，不敢求表现，错失吸引女生的机会，
+坏男人在追求女生的时候，知道一开始就要展现优势，赢得女人心，免得错失良机，后悔莫及。&lt;/p&gt;
+
+&lt;h3&gt;信念10 骑驴找马&lt;/h3&gt;
+
+&lt;p&gt;好人回莫名其妙的给自己设限，并且无缘无故地对一个女生开始深情款款；
+坏男人知道在和对方的感情没有确定的时候，一定要多看看，多认识其他异性。&lt;/p&gt;
+
+&lt;h3&gt;信念11 巧借美女效应&lt;/h3&gt;
+
+&lt;p&gt;好人被女生予取予求，变现得像个弱者；坏男人深深了解，人是倾向于“崇拜强者，欺负弱者”的，
+所以他们立志要成为强者，不要成为弱者。&lt;/p&gt;
+
+&lt;h3&gt;信念12 男人外貌本无用&lt;/h3&gt;
+
+&lt;p&gt;好人以为外貌和财富是吸引女人的主要因素，但是他没有，所以容易自卑；
+坏人相信自信、幽默风趣、大方的肢体语言和满不在乎的态度，才是赢得女人心的制胜关键。&lt;/p&gt;
+
+&lt;h3&gt;信念13 道高一尺 魔高一丈&lt;/h3&gt;
+
+&lt;p&gt;好人无法对女人报复或反击，顶多用嘴说说罢了；坏男人懂得“以直报怨”，绝对不会白白被拗！&lt;/p&gt;
+
+&lt;h3&gt;信念14 暧昧是吸引女人的最高境界&lt;/h3&gt;
+
+&lt;p&gt;好人喜欢用言语表白；坏男人动手动脚，就是不表白。&lt;/p&gt;
+
+&lt;h3&gt;信念15 别把美貌当回事&lt;/h3&gt;
+
+&lt;p&gt;好人把美女外形的美丽，当成是一件很了不起的事；坏男人把女人的容貌，当成参考而已。&lt;/p&gt;
+
+&lt;h3&gt;信念16 女人是听觉动物&lt;/h3&gt;
+
+&lt;p&gt;好人对女人的付出，一直是劳心劳力地做苦工；
+坏男人懂得多用嘴巴说，省时省力。&lt;/p&gt;
+
+&lt;h3&gt;信念17 靠不住的网络情缘&lt;/h3&gt;
+
+&lt;p&gt;好人总是幻想电影和电视剧中的美好情节会出现在自己身上，所以大量依赖网络来交友，
+企图制造网络情缘；坏男人知道网络只是用来了解对方的工具，直接用搭讪的方式来和心仪的女性认识，
+才是最诚实、最经济的做法。&lt;/p&gt;
+
+&lt;h3&gt;信念18 两性交往，求同还需存异&lt;/h3&gt;
+
+&lt;p&gt;好人在对待女生的时候，倾向于在原则和价值观之间摇摆，不知所措；
+坏男人知道，坚定自己的立场，但是也了解男女间的差异，才能得到女孩子的喜欢。&lt;/p&gt;
+
+&lt;h3&gt;信念19 过分礼貌是一种懦弱&lt;/h3&gt;
+
+&lt;p&gt;好人往往过于礼貌，让女人觉得他婆婆妈妈的；坏男人保持应有的礼貌，但是懂得解决问题并立刻向前看。&lt;/p&gt;
+
+&lt;h3&gt;信念20 从替补男友到梦中情人&lt;/h3&gt;
+
+&lt;p&gt;好人发现喜欢的女人有男朋友，就会马上放弃，或者痴心地等待；
+坏男人在认识女人时，根本不问对方有没有男朋友（只问有没有结婚），相信对方喜不喜欢他才是问题的重心。&lt;/p&gt;
+
+&lt;h3&gt;信念21 设置爱情停损点&lt;/h3&gt;
+
+&lt;p&gt;好人对于女人不喜欢自己的事实，倾向于逃避或不面对，然后继续做白工；
+坏男人懂得见机行事，设置停损点，一看没戏，马上撤军。&lt;/p&gt;
+
+&lt;h3&gt;信念22 爱，是一种修行&lt;/h3&gt;
+
+&lt;p&gt;好人感情受挫时，倾向于抱怨；坏男人知道，人生本来就是一个学习成长的过程，
+唯有从失败中学习，努力找方法改善自己，发挥最大优点，才能赢得女人心。&lt;/p&gt;
+
+&lt;h3&gt;信念23 放大自己的强项&lt;/h3&gt;
+
+&lt;p&gt;好人对于女生因为他的条件，没有达到让她满意的标准时的批评，感到无奈和痛苦；
+坏男人认为他自有杰出的地方，不必完全照着对方的标准来看自己。&lt;/p&gt;
+
+&lt;h3&gt;信念24 保持神秘感，让女人牵肠挂肚&lt;/h3&gt;
+
+&lt;p&gt;好人在追求女孩时，陷入了一般男人都会陷入的困境，也就是无法显示出自己的不同和优越性；
+坏男人知道，追求女生要保持神秘感，Be Cocky and Funny!&lt;/p&gt;
+
+&lt;h3&gt;信念25 追求女生是一场无止境的战争&lt;/h3&gt;
+
+&lt;p&gt;好人以为，一个心爱的女人跟他在一起之后，自己就可以松懈了；坏男人知道，这是一场无止境的战争，至死方休。&lt;/p&gt;
+
+&lt;p&gt;--- 完 ---&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>拆掉思维的墙</title>
+   <link href="http://tuohuang.info/break-the-wall-of-mind"/>
+   <updated>2011-11-22T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/break-the-wall-of-mind</id>
+   <content type="html">&lt;p&gt;&lt;a href=&quot;http://book.douban.com/subject/4953695/&quot;&gt;&lt;img src=&quot;http://img3.douban.com/mpic/s6907698.jpg&quot; alt=&quot;拆掉思维的墙&quot;&gt;
+&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;昨晚没带电脑回家，大致浏览了一下这本书的第一章，主要讲了以下几条观点&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;不要买房，买房会让自己以后的生活都固定了&lt;/li&gt;
+&lt;li&gt;某些信念是阻碍自己进步的障碍，要去除&lt;/li&gt;
+&lt;li&gt;很多女人强调要找个可以给她安全感的男人，其实是因为她们本身没有安全感&lt;/li&gt;
+&lt;/ul&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>女人是触觉动物</title>
+   <link href="http://tuohuang.info/women-are-touching-lover"/>
+   <updated>2011-11-21T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/women-are-touching-lover</id>
+   <content type="html">&lt;p&gt;&lt;strong&gt;女人是触觉动物和听觉动物&lt;/strong&gt;，室友小华昨天这么说的。&lt;/p&gt;
+
+&lt;p&gt;还记得2009年的一次失败案例，她说觉得我冷漠。这是为什么呢？
+我想可能是一方面我太多打压和调侃了，另外就是没有触碰她，包括上地铁没去轻轻推她，
+以及在拥挤的地铁站里在人群里穿行，没有去拉她。&lt;/p&gt;
+
+&lt;p&gt;前段时间叫小洁去夜店，那天都已经拉家里了，都没TD，实在是因为不熟练，没操作过，不知道后面怎么做。
+那天我们在夜店里有肢体接触，比如，拉着她去舞池啊，过马路扶她一下。还有，最后和她一起回去，车到离我们家都不远的地方就停了，
+我拉她下来，然后说，到我家坐坐吧，搂她的肩，她就乖乖跟我走了。我了个去啊，这么好机会，我却放过了。&lt;/p&gt;
+
+&lt;p&gt;在说说比较成功的案例吧，去年八月认识的阿耐，虽然过程拖的很漫长，最后也没TD，但让我体会到了touch的威力。
+女生对我有好感的时候，多一点kino没什么吧，收益很高，风险很小。&lt;/p&gt;
+
+&lt;p&gt;上午试着调戏了一下小静，下面是聊天记录&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ImPUA 10:06:01 
+你刚才太搞笑了
+小静 10:06:33 
+ 呵呵~~~  你就是落进下石
+小静 10:06:53 
+ 人家都觉得不好意思了，你还说
+小静 10:06:56 
+
+ImPUA 10:07:36 
+哦~~~~  是我不好 揭你老底了 不过 你不觉得你给大家带来了欢乐吗
+小静 10:08:33 
+什么嘛，我刚刚是不小心嘛
+小静 10:08:58 
+  在想事情太投入了....
+小静 10:09:05 
+
+ImPUA 10:09:31 
+想什么呢   之前只是在说郑老师 周老师 莫非你对他们有想法
+小静 10:11:14 
+  对他们有什么想法啊，要说有想法也是对你嘛 
+小静 10:11:19 
+
+ImPUA 10:11:52 
+哎呦 你这是表白吗  
+小静 10:12:23 
+呵呵，被你看出来了呀
+小静 10:12:33 
+
+ImPUA 10:13:03 
+那好 下了班去领证吧
+小静 10:14:00 
+行， 别落跑哦！！
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这是同事，平时小小暧昧一下就行了，操作起来还有点难度，不知道她是什么背景。&lt;/p&gt;
+
+&lt;p&gt;被苏苏和小玉晃点了，说临时有事，晚上不见了。妈的也不早说，还好老子有后备的，再约。一定要多找机会锻炼自己临场能力。&lt;/p&gt;
+
+&lt;p&gt;挺想搞小倩的，据阿成说她的叫床声音很好听。我不介意接手朋友的ex，这样多好，兄弟情义嘛。&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>无法突破</title>
+   <link href="http://tuohuang.info/cannot-break-through"/>
+   <updated>2011-11-20T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/cannot-break-through</id>
+   <content type="html">&lt;p&gt;昨天叫小莉跳舞，她说来就来了，还化了妆，应该是对我挺有好感的，但是我始终kino不足。
+总是这样，这样一直都会在友谊圈里。到头来，女性朋友一大堆，能TD的却没有。&lt;/p&gt;
+
+&lt;p&gt;刚才小华跟我讲了一下kino的重要性，起初在一些场合，简单的kino，看似无心，女生却很有杀伤力。
+比如，出电梯的时候用手揽一下，这让女生感觉很受照顾，又不表露出需求感，也不猥琐，还很浪漫。
+过马路什么的就不说了，一定要抓住这样的时机。&lt;/p&gt;
+
+&lt;p&gt;下周要照顾的几个女客户，分别是 苏苏、小玉、小婷、小莉、小洁，这次不能再放过小洁了，上次本来可以TD的，
+悔啊，悔得我肠子都清了。&lt;/p&gt;
+
+&lt;p&gt;还没决定考博考哪个，如果报财金学院吧，好导师肯定也难，报新闻吧，美女是多，
+但未必搞得了，而且到底有没有优势还不清楚，明天先给那导师发个邮件吧。&lt;/p&gt;
+
+&lt;p&gt;--- 完 ---&lt;/p&gt;
+</content>
+ </entry>
+ 
+ <entry>
+   <title>开博了</title>
+   <link href="http://tuohuang.info/start-blogging"/>
+   <updated>2011-11-19T00:00:00+08:00</updated>
+   <id>http://tuohuang.info/start-blogging</id>
+   <content type="html">&lt;p&gt;从今天开始，本博客正式启动。本博客的主题是PUA和生活随想。在这里我不会公开自己的身份。
+本博客的域名用的是.tk，据说90天内访问人数少于25的话就会被删除域名，管它的呢，反正用&lt;a href=&quot;http://pua.github.com&quot;&gt;http://pua.github.com&lt;/a&gt;
+一样可以登录&lt;/p&gt;
+
+&lt;p&gt;2011-11-26 更新&lt;br&gt;
+现在博客的域名已经改为impua.info了，tk域名感觉还是不稳定&lt;/p&gt;
+
+&lt;p&gt;2012-04-10 更新&lt;br&gt;
+修改了博客的界面：  &lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;让顶部导航条固定住&lt;/li&gt;
+&lt;li&gt;博客文章可以自动生成索引列表&lt;/li&gt;
+&lt;li&gt;左键是前一篇，右键是后一篇文章&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;--- 完 ---&lt;/p&gt;
+</content>
+ </entry>
+ 
+</feed>
