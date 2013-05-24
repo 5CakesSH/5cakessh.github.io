@@ -24,7 +24,8 @@ Embedding html without surrounding with empty newline.
 <div>_markdown_</div>
 extra text.
 
-
+a line should
+break it here
 
 ~~awesome~~
 
@@ -38,4 +39,4 @@ Content Cell  | Content Cell
 Content Cell  | Content Cell
 
 
-foo_bar_function
+foo_bar_functio
