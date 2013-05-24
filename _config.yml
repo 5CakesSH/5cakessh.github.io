@@ -2,4 +2,4 @@ pygments: true
 permalink: '/:title'
 markdown: redcarpet
 redcarpet:
-  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "tables", "superscript", "strikethrough", "lax_spacing"]
+  extensions: ["no_intra_emphasis","hard_wrap", "fenced_code_blocks", "autolink", "tables", "superscript", "strikethrough", "lax_spacing"]
