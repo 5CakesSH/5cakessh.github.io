@@ -83,44 +83,149 @@
   </div>
 
   <div class="ten columns" id="article-content">
-    <p>From an iOS developer's perspective, I find that it is extremely hard to apply features like &quot;<strong>set default selection when starting</strong>&quot; and &quot;<strong>remember selection status after user clicked row</strong>&quot; to ListView. </p>
+    <p>From an iOS developer&#39;s perspective, I find that it is extremely hard to apply features like &quot;**set default selection when starting**&quot; and &quot;**remember selection status after user clicked row**&quot; to ListView. </p>
 
-<p>So let's start with <strong>&quot;remember selection&quot;</strong> first.The problem is that even if you know that 
-you can use selector xml to define highlight/pressed/focus style.But that style will not 
-be kept after user clicked that row. For instance, I have a highlighting selector xml (list_selector.xml under res/drawable folder) like this (but you may have other fields need to highlight like text color of textview in row):
-Liquid error: undefined method <code>join' for #&lt;String:0x007f9b93025630&gt;
-and list_selector_pressed.xml which defined the highlighting style--set the background color
-to a gray color :
-Liquid error: undefined method</code>join' for #<a href="String:0x007f9b930240a0">String:0x007f9b930240a0</a>
-So as @David Hedlund suggested:</p>
+<p>So let&#39;s start with <strong>&quot;remember selection&quot;</strong> first.The problem is that even if you know that <br>
+you can use selector xml to define highlight/pressed/focus style.But that style will not <br>
+be kept after user clicked that row. For instance, I have a highlighting selector xml (list_selector.xml under res/drawable folder) like this (but you may have other fields need to highlight like text color of textview in row):</p>
+
+<div class="highlight"><pre><code class="xml"><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="nt">&lt;selector</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;item</span> <span class="na">android:drawable=</span><span class="s">&quot;@drawable/list_selector_pressed&quot;</span> 
+        <span class="na">android:state_pressed=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;item</span> <span class="na">android:drawable=</span><span class="s">&quot;@drawable/list_selector_pressed&quot;</span> 
+        <span class="na">android:state_selected=</span><span class="s">&quot;true&quot;</span> <span class="nt">/&gt;</span>
+<span class="nt">&lt;/selector&gt;</span>    
+</code></pre></div>
+
+<p>and list_selector_pressed.xml which defined the highlighting style--set the background color<br>
+to a gray color :</p>
+
+<div class="highlight"><pre><code class="xml"><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span>
+<span class="nt">&lt;layer-list</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;item&gt;</span>
+        <span class="nt">&lt;shape</span> <span class="na">xmlns:android=</span><span class="s">&quot;http://schemas.android.com/apk/res/android&quot;</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;solid</span> <span class="na">android:color=</span><span class="s">&quot;@color/dark_gray&quot;</span> <span class="nt">/&gt;</span>
+        <span class="nt">&lt;/shape&gt;</span>
+    <span class="nt">&lt;/item&gt;</span>
+<span class="nt">&lt;/layer-list&gt;</span>
+</code></pre></div>
+
+<p>So as @David Hedlund suggested:</p>
+
 <blockquote>
 <p>Rather, assign an OnItemClickListener, and have it store away the id of the selected item into some variable. </p>
 </blockquote>
-<p>you need to create a instance variable on top of your class:
-Liquid error: undefined method <code>join' for &quot;\n        private View currentSelectedView;\n&quot;:String
-then go to 
-Liquid error: undefined method</code>join' for #<a href="String:0x007f9b9301fc58">String:0x007f9b9301fc58</a>
-Pretty simple: we check if currentSelectedView is null or current clicked view or not. we first to unhighlight any style by calling method unhighlightCurrentRow(currentSelectedView)---you may wonder why we pass instant variable currentSelectedView as parameter, I will explain it later.  Then we assign view to currentSelectedView and highlight current row; so that the style will persist after user's clicking is done.</p>
 
-<p>Liquid error: undefined method `join' for #<a href="String:0x007f9b9301c0f8">String:0x007f9b9301c0f8</a></p>
+<p>you need to create a instance variable on top of your class:</p>
 
-<p>Aha, that's it. That is how we implement &quot;remember selection&quot; for list view. As you see, 
+<div class="highlight"><pre><code class="java">        <span class="kd">private</span> <span class="n">View</span> <span class="n">currentSelectedView</span><span class="o">;</span>
+</code></pre></div>
+
+<p>then go to </p>
+
+<div class="highlight"><pre><code class="java"><span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onListItemClick</span><span class="o">(</span><span class="n">ListView</span> <span class="n">l</span><span class="o">,</span> <span class="n">View</span> <span class="n">v</span><span class="o">,</span> <span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="kt">long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">currentSelectedView</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">currentSelectedView</span> <span class="o">!=</span> <span class="n">v</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">unhighlightCurrentRow</span><span class="o">(</span><span class="n">currentSelectedView</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="n">currentSelectedView</span> <span class="o">=</span> <span class="n">v</span><span class="o">;</span>
+    <span class="n">highlightCurrentRow</span><span class="o">(</span><span class="n">currentSelectedView</span><span class="o">);</span>
+    <span class="c1">//other codes </span>
+    <span class="o">}</span>
+</code></pre></div>
+
+<p>Pretty simple: we check if currentSelectedView is null or current clicked view or not. we first to unhighlight any style by calling method unhighlightCurrentRow(currentSelectedView)---you may wonder why we pass instant variable currentSelectedView as parameter, I will explain it later.  Then we assign view to currentSelectedView and highlight current row; so that the style will persist after user&#39;s clicking is done.</p>
+
+<div class="highlight"><pre><code class="java"><span class="kd">private</span> <span class="kt">void</span> <span class="nf">unhighlightCurrentRow</span><span class="o">(</span><span class="n">View</span> <span class="n">rowView</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">rowView</span><span class="o">.</span><span class="na">setBackgroundColor</span><span class="o">(</span><span class="n">Color</span><span class="o">.</span><span class="na">TRANSPARENT</span><span class="o">);</span>
+    <span class="n">TextView</span> <span class="n">textView</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextView</span><span class="o">)</span> <span class="n">rowView</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">menuTitle</span><span class="o">);</span>
+    <span class="n">textView</span><span class="o">.</span><span class="na">setTextColor</span><span class="o">(</span><span class="n">getResources</span><span class="o">().</span><span class="na">getColor</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">color</span><span class="o">.</span><span class="na">white</span><span class="o">));</span>
+<span class="o">}</span>
+
+<span class="kd">private</span> <span class="kt">void</span> <span class="nf">highlightCurrentRow</span><span class="o">(</span><span class="n">View</span> <span class="n">rowView</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">rowView</span><span class="o">.</span><span class="na">setBackgroundColor</span><span class="o">(</span><span class="n">getResources</span><span class="o">().</span><span class="na">getColor</span><span class="o">(</span>
+            <span class="n">R</span><span class="o">.</span><span class="na">color</span><span class="o">.</span><span class="na">dark_gray</span><span class="o">));</span>
+    <span class="n">TextView</span> <span class="n">textView</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextView</span><span class="o">)</span> <span class="n">rowView</span><span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">menuTitle</span><span class="o">);</span>
+    <span class="n">textView</span><span class="o">.</span><span class="na">setTextColor</span><span class="o">(</span><span class="n">getResources</span><span class="o">().</span><span class="na">getColor</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">color</span><span class="o">.</span><span class="na">yellow</span><span class="o">));</span>
+
+<span class="o">}</span> 
+</code></pre></div>
+
+<p>Aha, that&#39;s it. That is how we implement &quot;remember selection&quot; for list view. As you see, <br>
 we have to duplicate the codes for styling both in xml and java code--pretty stupid :(</p>
 
-<p><strong>Next about &quot;set default selection&quot;</strong>. You may think that you can do this 
-Liquid error: undefined method `join' for #<a href="String:0x007f9b93619640">String:0x007f9b93619640</a><br>
-in onCreate() in activity or onActivityCreated() in fragment.<br>
-But if you run it , you will get NullPointer exception and why ?
-because at this time, the listview is not rendered yet and Android doesn't like iOS which have viewWillAppear. SO you have to create an instant variable to remember whether it is first time to render listview cell and in onListItemClick to unset that variable:</p>
+<p><strong>Next about &quot;set default selection&quot;</strong>. You may think that you can do this </p>
 
-<p>So under currentSelectedView declaration:
-Liquid error: undefined method `join' for &quot;\n    private Boolean firstTimeStartup = true;\n&quot;:String
-then add methods : suppose we want to highlight the first row in list view:</p>
+<div class="highlight"><pre><code class="java"> <span class="n">listView</span><span class="o">.</span><span class="na">setAdapter</span><span class="o">(</span><span class="n">adatper</span><span class="o">)</span>
+    <span class="n">listView</span><span class="o">.</span><span class="na">setSelection</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+    <span class="n">currentSelectedView</span> <span class="o">=</span> <span class="n">listView</span><span class="o">.</span><span class="na">getChildAt</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+    <span class="n">highlightCurrentRow</span><span class="o">(</span><span class="n">currentSelectedView</span><span class="o">);</span>
+</code></pre></div>
+    
 
-<p>Liquid error: undefined method <code>join' for #&lt;String:0x007f9b93617868&gt;
-Pretty simple.
-But you need to make some changes in onListItemClick method:
-Liquid error: undefined method</code>join' for #<a href="String:0x007f9b936170e8">String:0x007f9b936170e8</a></p>
+<p>in onCreate() in activity or onActivityCreated() in fragment.<br><br>
+But if you run it , you will get NullPointer exception and why ?<br>
+because at this time, the listview is not rendered yet and Android doesn&#39;t like iOS which have viewWillAppear. SO you have to create an instant variable to remember whether it is first time to render listview cell and in onListItemClick to unset that variable:</p>
+
+<p>So under currentSelectedView declaration:</p>
+
+<div class="highlight"><pre><code class="java">    <span class="kd">private</span> <span class="n">Boolean</span> <span class="n">firstTimeStartup</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+</code></pre></div>
+
+<p>then add methods : suppose we want to highlight the first row in list view:</p>
+
+<div class="highlight"><pre><code class="java"><span class="kd">public</span> <span class="kd">class</span> <span class="nc">HomeAdapter</span> <span class="kd">extends</span> <span class="n">ArrayAdapter</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="o">{</span>
+    <span class="kt">int</span> <span class="n">layoutResourceId</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">HomeAdapter</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">,</span> <span class="kt">int</span> <span class="n">textViewResourceId</span><span class="o">,</span>
+            <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">objects</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">textViewResourceId</span><span class="o">,</span> <span class="n">objects</span><span class="o">);</span>
+        <span class="n">layoutResourceId</span> <span class="o">=</span> <span class="n">textViewResourceId</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="n">View</span> <span class="nf">getView</span><span class="o">(</span><span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="n">View</span> <span class="n">convertView</span><span class="o">,</span> <span class="n">ViewGroup</span> <span class="n">parent</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">convertView</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">convertView</span> <span class="o">=</span> <span class="n">LayoutInflater</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">getContext</span><span class="o">()).</span><span class="na">inflate</span><span class="o">(</span>
+                    <span class="n">layoutResourceId</span><span class="o">,</span> <span class="kc">null</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="k">if</span> <span class="o">(</span><span class="n">firstTimeStartup</span> <span class="o">&amp;&amp;</span> <span class="n">postion</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">highlightCurrentRow</span><span class="o">(</span><span class="n">convertView</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="n">unhighlightCurrentRow</span><span class="o">(</span><span class="n">convertView</span><span class="o">);</span>
+        <span class="o">}</span>
+
+        <span class="n">TextView</span> <span class="n">title</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextView</span><span class="o">)</span> <span class="n">convertView</span>
+                <span class="o">.</span><span class="na">findViewById</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">id</span><span class="o">.</span><span class="na">menuTitle</span><span class="o">);</span>
+        <span class="n">title</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="n">getItem</span><span class="o">(</span><span class="n">position</span><span class="o">));</span>
+        <span class="k">return</span> <span class="n">convertView</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div>
+
+<p>Pretty simple.<br>
+But you need to make some changes in onListItemClick method:</p>
+
+<div class="highlight"><pre><code class="java"><span class="nd">@Override</span>
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onListItemClick</span><span class="o">(</span><span class="n">ListView</span> <span class="n">l</span><span class="o">,</span> <span class="n">View</span> <span class="n">v</span><span class="o">,</span> <span class="kt">int</span> <span class="n">position</span><span class="o">,</span> <span class="kt">long</span> <span class="n">id</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="k">if</span> <span class="o">(</span><span class="n">firstTimeStartup</span><span class="o">)</span> <span class="o">{</span><span class="c1">// first time  highlight first row</span>
+        <span class="n">currentSelectedView</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="na">getChildAt</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="n">firstTimeStartup</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span> 
+    <span class="k">if</span> <span class="o">(</span><span class="n">currentSelectedView</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">currentSelectedView</span> <span class="o">!=</span> <span class="n">v</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">unhighlightCurrentRow</span><span class="o">(</span><span class="n">currentSelectedView</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="n">currentSelectedView</span> <span class="o">=</span> <span class="n">v</span><span class="o">;</span>
+    <span class="n">highlightCurrentRow</span><span class="o">(</span><span class="n">currentSelectedView</span><span class="o">);</span>
+
+     <span class="c1">//other codes</span>
+<span class="o">}</span>
+</code></pre></div>
 
 <p>There you go! Enjoy Android :)</p>
 

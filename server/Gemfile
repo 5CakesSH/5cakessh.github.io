@@ -1,3 +1,3 @@
 source 'http://rubygems.org'
-
-gem 'jekyll', '~>0.9'
+gem 'redcarpet'
+gem 'jekyll', :git => "git://github.com/mojombo/jekyll.git", :branch => "0.12.1-release"

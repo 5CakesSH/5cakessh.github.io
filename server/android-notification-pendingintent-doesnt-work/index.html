@@ -83,23 +83,80 @@
   </div>
 
   <div class="ten columns" id="article-content">
-    <p>最近需要在项目中添加<a href="http://capdroid.wordpress.com/2012/07/16/android-4-1-jelly-beans-notification-tutorial-part-ii/">Android 4.1 Notification BigPicture</a> 支持，来让这个提醒条更加美观。下面便是代码：
-Liquid error: undefined method `join' for #<a href="String:0x007f9b934221c0">String:0x007f9b934221c0</a> 
-很简单的逻辑， notification中有两个按钮，一个是查看，一个是分享。然后分享的话，我们在extra中将其To_SHARE设置为真，而如果是查看的话，其值为假。</p>
+    <p>最近需要在项目中添加<a href="http://capdroid.wordpress.com/2012/07/16/android-4-1-jelly-beans-notification-tutorial-part-ii/">Android 4.1 Notification BigPicture</a> 支持，来让这个提醒条更加美观。下面便是代码：</p>
+<div class="highlight"><pre><code class="java"><span class="n">Intent</span> <span class="n">notificationIntent</span>  <span class="o">=</span> <span class="n">fillDatabaseContentToIntent</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">cursor1</span><span class="o">,</span> <span class="n">cursor2</span><span class="o">,</span> <span class="kc">false</span><span class="o">);</span>
+<span class="n">Intent</span> <span class="n">shareIntent</span> <span class="o">=</span> <span class="n">fillDatabaseContentToIntent</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">cursor1</span><span class="o">,</span> <span class="n">cursor2</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
 
-<p>接下来我们在DetailActivity中，获取TO_SHARE的值来决定是否应该调出分享操作。
-Liquid error: undefined method `join' for #<a href="String:0x007f9b93421a40">String:0x007f9b93421a40</a>
-但是我们发现这个 isToShareFromNotification 永远都是false,这个很是奇怪。
+<span class="n">cursor1</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+<span class="n">cursor2</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+<span class="k">if</span><span class="o">(</span><span class="n">myDbHelper</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span>
+    <span class="n">myDbHelper</span><span class="o">.</span><span class="na">close</span><span class="o">();</span> 
+<span class="n">Bitmap</span> <span class="n">bitmapForBigPicture</span> <span class="o">=</span> <span class="n">BitmapFactory</span><span class="o">.</span><span class="na">decodeResource</span><span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">getResources</span><span class="o">(),</span>
+        <span class="n">R</span><span class="o">.</span><span class="na">drawable</span><span class="o">.</span><span class="na">background1</span><span class="o">);</span>
+
+<span class="n">NotificationCompat</span><span class="o">.</span><span class="na">Builder</span> <span class="n">notification</span> <span class="o">=</span>  <span class="k">new</span> <span class="n">NotificationCompat</span><span class="o">.</span><span class="na">Builder</span><span class="o">(</span><span class="n">context</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setSmallIcon</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">drawable</span><span class="o">.</span><span class="na">fish_grey</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setContentTitle</span><span class="o">(</span><span class="n">contentTitle</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setContentText</span><span class="o">(</span><span class="n">contentText</span><span class="o">)</span> 
+        <span class="o">.</span><span class="na">setStyle</span><span class="o">(</span><span class="k">new</span> <span class="n">NotificationCompat</span><span class="o">.</span><span class="na">BigPictureStyle</span><span class="o">().</span><span class="na">bigPicture</span><span class="o">(</span><span class="n">bitmapForBigPicture</span><span class="o">).</span><span class="na">setSummaryText</span><span class="o">(</span><span class="n">contentText</span><span class="o">).</span><span class="na">setBigContentTitle</span><span class="o">(</span><span class="n">contentTitle</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">addAction</span><span class="o">(</span>
+                <span class="n">android</span><span class="o">.</span><span class="na">R</span><span class="o">.</span><span class="na">drawable</span><span class="o">.</span><span class="na">ic_menu_add</span><span class="o">,</span>
+                <span class="s">&quot;View&quot;</span><span class="o">,</span>
+                <span class="n">PendingIntent</span><span class="o">.</span><span class="na">getActivity</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">(),</span>
+                        <span class="n">notificationIntent</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="kc">null</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">addAction</span><span class="o">(</span>
+                <span class="n">android</span><span class="o">.</span><span class="na">R</span><span class="o">.</span><span class="na">drawable</span><span class="o">.</span><span class="na">ic_menu_share</span><span class="o">,</span>
+                <span class="s">&quot;Share&quot;</span><span class="o">,</span>
+                <span class="n">PendingIntent</span><span class="o">.</span><span class="na">getActivity</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()</span> <span class="o">+</span> <span class="mi">10</span><span class="o">,</span>
+                        <span class="n">shareIntent</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="kc">null</span><span class="o">));</span>
+
+
+
+<span class="kd">private</span> <span class="n">Intent</span> <span class="nf">fillDatabaseContentToIntent</span><span class="o">(</span><span class="n">Context</span> <span class="n">context</span><span class="o">,</span> <span class="n">Cursor</span> <span class="n">cursor1</span><span class="o">,</span> <span class="n">Cursor</span> <span class="n">cursor2</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">openShare</span><span class="o">)</span> <span class="o">{</span>
+    <span class="n">Intent</span> <span class="n">notificationIntent</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Intent</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="n">DetailActivity</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+    <span class="n">notificationIntent</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="n">DataBaseHelper</span><span class="o">.</span><span class="na">CONTENT_ID_FOR_EXTRAS</span><span class="o">,</span> <span class="n">cursor1</span><span class="o">.</span><span class="na">getLong</span><span class="o">(</span><span class="n">cursor1</span><span class="o">.</span><span class="na">getColumnIndexOrThrow</span><span class="o">(</span><span class="n">DataBaseHelper</span><span class="o">.</span><span class="na">CONTENT_ID</span><span class="o">)));</span>
+    <span class="n">notificationIntent</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="n">DataBaseHelper</span><span class="o">.</span><span class="na">CATEGORY_ID_FOR_EXTRAS</span><span class="o">,</span> <span class="n">DataBaseHelper</span><span class="o">.</span><span class="na">FAKE_CATEGORY_ID_DAILY</span><span class="o">);</span>
+    <span class="n">notificationIntent</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="n">DataBaseHelper</span><span class="o">.</span><span class="na">CATEGORY_LABEL</span><span class="o">,</span> <span class="n">cursor2</span><span class="o">.</span><span class="na">getString</span><span class="o">(</span><span class="n">cursor2</span><span class="o">.</span><span class="na">getColumnIndexOrThrow</span><span class="o">(</span><span class="n">DataBaseHelper</span><span class="o">.</span><span class="na">CATEGORY_LABEL</span><span class="o">)));</span>
+    <span class="n">notificationIntent</span><span class="o">.</span><span class="na">putExtra</span><span class="o">(</span><span class="n">DetailActivity</span><span class="o">.</span><span class="na">TO_SHARE</span><span class="o">,</span> <span class="n">openShare</span><span class="o">);</span>
+    <span class="k">return</span> <span class="n">notificationIntent</span><span class="o">;</span>
+<span class="o">}</span>       
+</code></pre></div>
+<p>很简单的逻辑， notification中有两个按钮，一个是查看，一个是分享。然后分享的话，我们在extra中将其To_SHARE设置为真，而如果是查看的话，其值为假。</p>
+
+<p>接下来我们在DetailActivity中，获取TO_SHARE的值来决定是否应该调出分享操作。</p>
+<div class="highlight"><pre><code class="java"><span class="n">Bundle</span> <span class="n">extras</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">getIntent</span><span class="o">().</span><span class="na">getExtras</span><span class="o">();</span>
+<span class="n">Boolean</span> <span class="n">isToShareFromNotification</span> <span class="o">=</span>  <span class="n">extras</span><span class="o">.</span><span class="na">getBoolean</span><span class="o">(</span><span class="n">TO_SHARE</span><span class="o">);</span>
+<span class="k">if</span><span class="o">(</span><span class="n">isToShareFromNotification</span><span class="o">){</span>
+    <span class="n">gotoShare</span><span class="o">();</span>
+<span class="o">}</span>
+</code></pre></div>
+<p>但是我们发现这个 isToShareFromNotification 永远都是false,这个很是奇怪。<br>
 整来整去都木有想明白，网上搜了搜，果然发现了一个方案:<a href="http://stackoverflow.com/questions/3009059/android-pending-intent-notification-problem">android pending intent notification problem</a>.</p>
+
 <blockquote>
-<p>The way I solved that problem was by assigning a unique requestID when you get the PendingIntent:
-PendingIntent.getActivity(context, requestID, showIntent, 0); 
+<p>The way I solved that problem was by assigning a unique requestID when you get the PendingIntent:<br>
+PendingIntent.getActivity(context, requestID, showIntent, 0); <br>
 By doing so you are registering with the system different/unique intent instances.</p>
 </blockquote>
-<p>然后尝试了一下给一个不同的requestId.</p>
 
-<p>Liquid error: undefined method `join' for #<a href="String:0x007f9b93421310">String:0x007f9b93421310</a><br>
-果然就正常工作了。</p>
+<p>然后尝试了一下给一个不同的requestId.</p>
+<div class="highlight"><pre><code class="java"><span class="n">NotificationCompat</span><span class="o">.</span><span class="na">Builder</span> <span class="n">notification</span> <span class="o">=</span>  <span class="k">new</span> <span class="n">NotificationCompat</span><span class="o">.</span><span class="na">Builder</span><span class="o">(</span><span class="n">context</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setSmallIcon</span><span class="o">(</span><span class="n">R</span><span class="o">.</span><span class="na">drawable</span><span class="o">.</span><span class="na">fish_white</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setContentTitle</span><span class="o">(</span><span class="n">contentTitle</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setContentText</span><span class="o">(</span><span class="n">contentText</span><span class="o">)</span>
+        <span class="o">.</span><span class="na">setStyle</span><span class="o">(</span><span class="k">new</span> <span class="n">NotificationCompat</span><span class="o">.</span><span class="na">BigPictureStyle</span><span class="o">().</span><span class="na">bigPicture</span><span class="o">(</span><span class="n">bitmapForBigPicture</span><span class="o">).</span><span class="na">setSummaryText</span><span class="o">(</span><span class="n">contentText</span><span class="o">).</span><span class="na">setBigContentTitle</span><span class="o">(</span><span class="n">contentTitle</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">addAction</span><span class="o">(</span>
+                <span class="n">android</span><span class="o">.</span><span class="na">R</span><span class="o">.</span><span class="na">drawable</span><span class="o">.</span><span class="na">ic_menu_more</span><span class="o">,</span>
+                <span class="s">&quot;View&quot;</span><span class="o">,</span>
+                <span class="n">PendingIntent</span><span class="o">.</span><span class="na">getActivity</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">(),</span>
+                        <span class="n">notificationIntent</span><span class="o">,</span> <span class="n">PendingIntent</span><span class="o">.</span><span class="na">FLAG_UPDATE_CURRENT</span><span class="o">))</span>
+        <span class="o">.</span><span class="na">addAction</span><span class="o">(</span>
+                <span class="n">android</span><span class="o">.</span><span class="na">R</span><span class="o">.</span><span class="na">drawable</span><span class="o">.</span><span class="na">ic_menu_share</span><span class="o">,</span>
+                <span class="s">&quot;Share&quot;</span><span class="o">,</span>
+                <span class="n">PendingIntent</span><span class="o">.</span><span class="na">getActivity</span><span class="o">(</span><span class="n">context</span><span class="o">,</span> <span class="o">(</span><span class="kt">int</span><span class="o">)</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()</span> <span class="o">+</span> <span class="mi">10</span><span class="o">,</span>
+                        <span class="n">shareIntent</span><span class="o">,</span> <span class="n">PendingIntent</span><span class="o">.</span><span class="na">FLAG_UPDATE_CURRENT</span><span class="o">));</span>
+</code></pre></div>
+<p>果然就正常工作了。</p>
 
   </div>
   <hr style="visibility:hidden;"/>

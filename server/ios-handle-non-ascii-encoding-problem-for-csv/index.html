@@ -89,46 +89,76 @@
 
 <h2>CSV格式</h2>
 
-<p>这个比较棘手过程开始于：因为将要发送的CSV字符串中有中文符号（数据统计相关的东西），所以我需要支持unicode编码。
-<br/>
-当然最简单的实现方式是:
-Liquid error: undefined method `join' for #<a href="String:0x007f9b93550c18">String:0x007f9b93550c18</a><br>
-<br/>
-我们创建了一个<em>MFMailComposeViewController</em>实例，然后以逗号作为分隔符，'\n'作为换行标记来拼接我们的CSV字符串。在最后，我们设置数据的编码为<em>NSUTF8StringEncoding</em>.没什么特别的。
-<br/>
-**然后你迫不及待的从邮箱中下载打开CSV文件，但是发现却是一坨乱码！ **
-<br/>
+<p>这个比较棘手过程开始于：因为将要发送的CSV字符串中有中文符号（数据统计相关的东西），所以我需要支持unicode编码。<br>
+<br/><br>
+当然最简单的实现方式是:</p>
+
+<div class="highlight"><pre><code class="objectivec">   
+<span class="n">MFMailComposeViewController</span> <span class="o">*</span><span class="n">emailComposer</span> <span class="o">=</span> <span class="p">[[</span><span class="n">MFMailComposeViewController</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>   
+<span class="n">NSMutableString</span> <span class="o">*</span><span class="n">csvString</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableString</span> <span class="n">string</span><span class="p">];</span>
+<span class="p">[</span><span class="n">csvString</span> <span class="nl">appendString:</span><span class="s">@&quot;姓名,性别,体重,创建时间</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">];</span>
+<span class="n">NSString</span> <span class="o">*</span><span class="n">timestamp</span> <span class="o">=</span> <span class="p">[</span><span class="n">dateFormatter</span> <span class="nl">stringFromDate:</span><span class="p">[</span><span class="n">NSDate</span> <span class="n">date</span><span class="p">]];</span>
+<span class="p">[</span><span class="n">csvString</span> <span class="nl">appendString:</span><span class="p">[</span><span class="n">NSString</span> <span class="nl">stringWithFormat:</span><span class="s">@&quot;%@,%@,%@,%@</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">@&quot;黄拓&quot;</span><span class="p">,</span> <span class="s">@&quot;男&quot;</span><span class="p">,</span> <span class="s">@&quot;65 kg&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">]];</span>
+<span class="p">[</span><span class="n">csvString</span> <span class="nl">appendString:</span><span class="p">[</span><span class="n">NSString</span> <span class="nl">stringWithFormat:</span><span class="s">@&quot;%@,%@,%@,%@</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">@&quot;詹姆斯&quot;</span><span class="p">,</span> <span class="s">@&quot;女&quot;</span><span class="p">,</span> <span class="s">@&quot;25 kg&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">]];</span>  
+<span class="p">[</span><span class="n">picker</span> <span class="nl">addAttachmentData:</span><span class="p">[</span><span class="n">csvString</span> <span class="nl">dataUsingEncoding:</span><span class="n">NSUTF8StringEncoding</span><span class="p">]</span>  <span class="nl">mimeType:</span><span class="s">@&quot;text/csv&quot;</span> <span class="nl">fileName:</span><span class="s">@&quot;statistics.csv&quot;</span><span class="p">];</span>
+</code></pre></div>
+    
+
+<p><br/><br>
+我们创建了一个*MFMailComposeViewController*实例，然后以逗号作为分隔符，&#39;\n&#39;作为换行标记来拼接我们的CSV字符串。在最后，我们设置数据的编码为*NSUTF8StringEncoding*.没什么特别的。<br>
+<br/><br>
+**然后你迫不及待的从邮箱中下载打开CSV文件，但是发现却是一坨乱码！ **<br>
+<br/><br>
 分隔符貌似没有效果，所有的数据都挤在了一个格子里，而且只有一行。</p>
 
 <h5>修复</h5>
 
-<p>很简单的一个修复办法是将逗号替换为tab('\t')，并且将换行符替换为'\r\n'.如果你不这么做，它就没办法工作。 @_@
-<br/>
-下面是一个修复的版本：
-Liquid error: undefined method `join' for #<a href="String:0x007f9b9354fdb8">String:0x007f9b9354fdb8</a>        </p>
+<p>很简单的一个修复办法是将逗号替换为tab(&#39;\t&#39;)，并且将换行符替换为&#39;\r\n&#39;.如果你不这么做，它就没办法工作。 @_@<br>
+<br/><br>
+下面是一个修复的版本：</p>
 
-<p>现在你重新试一下，会发现格式已经正确了，有正确的格子数和行数。<br>
-<br/>
-<strong>新的问题是： 每个格子的中文都是乱码？</strong>
-<img src="/static/images/20130118/1.png" alt="乱码">
-</p>
+<div class="highlight"><pre><code class="objectivec">       
+<span class="n">MFMailComposeViewController</span> <span class="o">*</span><span class="n">emailComposer</span> <span class="o">=</span> <span class="p">[[</span><span class="n">MFMailComposeViewController</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">init</span><span class="p">];</span>   
+ <span class="n">NSMutableString</span> <span class="o">*</span><span class="n">csvString</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableString</span> <span class="n">string</span><span class="p">];</span>
+<span class="p">[</span><span class="n">csvString</span> <span class="nl">appendString:</span><span class="s">@&quot;姓名</span><span class="se">\t</span><span class="s">性别</span><span class="se">\t</span><span class="s">体重</span><span class="se">\t</span><span class="s">创建时间</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">];</span>
+<span class="n">NSString</span> <span class="o">*</span><span class="n">timestamp</span> <span class="o">=</span> <span class="p">[</span><span class="n">dateFormatter</span> <span class="nl">stringFromDate:</span><span class="p">[</span><span class="n">NSDate</span> <span class="n">date</span><span class="p">]];</span>
+<span class="p">[</span><span class="n">csvString</span> <span class="nl">appendString:</span><span class="p">[</span><span class="n">NSString</span> <span class="nl">stringWithFormat:</span><span class="s">@&quot;%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">@&quot;黄拓&quot;</span><span class="p">,</span> <span class="s">@&quot;男&quot;</span><span class="p">,</span> <span class="s">@&quot;65 kg&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">]];</span>
+<span class="p">[</span><span class="n">csvString</span> <span class="nl">appendString:</span><span class="p">[</span><span class="n">NSString</span> <span class="nl">stringWithFormat:</span><span class="s">@&quot;%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">@&quot;詹姆斯&quot;</span><span class="p">,</span> <span class="s">@&quot;女&quot;</span><span class="p">,</span> <span class="s">@&quot;25 kg&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">]];</span>    
+<span class="p">[</span><span class="n">picker</span> <span class="nl">addAttachmentData:</span><span class="p">[</span><span class="n">csvString</span> <span class="nl">dataUsingEncoding:</span><span class="n">NSUTF8StringEncoding</span><span class="p">]</span>  <span class="nl">mimeType:</span><span class="s">@&quot;text/csv&quot;</span> <span class="nl">fileName:</span><span class="s">@&quot;statistics.csv&quot;</span><span class="p">];</span>
+</code></pre></div>
+        
+
+<p>现在你重新试一下，会发现格式已经正确了，有正确的格子数和行数。<br><br>
+<br/><br>
+<strong>新的问题是： 每个格子的中文都是乱码？</strong><br>
+<img src="/static/images/20130118/1.png" alt="乱码"></p>
 
 <h2>Non-ASCII编码以及BOM</h2>
 
-<p>要解决这些乱码问题，首先我们需要指导为什么我们可以通过向CSV文件的头部插入BOM的方式来消除乱码？长话短说，就是它一个让文件接收方知道发送方使用了何种Unicode编码方式的标记，所以通过它我们可以正确的解析字符流。
-<br/>
-通过<a href="http://en.wikipedia.org/wiki/Byte_order_mark">BOM Wiki</a>，我们指导utf-8的十六位表示是&quot;EF BB BF&quot;. 接着我们可以将其添加到CSV字符串的头部，
+<p>要解决这些乱码问题，首先我们需要指导为什么我们可以通过向CSV文件的头部插入BOM的方式来消除乱码？长话短说，就是它一个让文件接收方知道发送方使用了何种Unicode编码方式的标记，所以通过它我们可以正确的解析字符流。<br>
+<br/><br>
+通过<a href="http://en.wikipedia.org/wiki/Byte_order_mark">BOM Wiki</a>，我们指导utf-8的十六位表示是&quot;EF BB BF&quot;. 接着我们可以将其添加到CSV字符串的头部，<br>
 然后特别需要的是将编码格式从utf-8改为utf-16，否则中文将无法正常显示。</p>
 
-<p>下面是最终代码：
-Liquid error: undefined method `join' for #<a href="String:0x007f9b9354f1b0">String:0x007f9b9354f1b0</a>    </p>
+<p>下面是最终代码：</p>
 
-<p>你可以很奇怪，我们应该只需要在头部添加BOM标记就好啦， 为什么每一行内容都需要添加这个标记？
-具体原因我无法解释，但是如果不加了，那么显示一行可能没问题，但是如果一旦显示超过四五行的内容，就会出现奇怪的乱码。<br>
-<img src="/static/images/20130118/2.png" alt="乱码">
-  </p>
+<div class="highlight"><pre><code class="objectivec">   
+<span class="n">NSMutableString</span> <span class="o">*</span><span class="n">csvString</span> <span class="o">=</span> <span class="p">[</span><span class="n">NSMutableString</span> <span class="n">string</span><span class="p">];</span>
+<span class="p">[</span><span class="n">csvString</span> <span class="nl">appendString:</span><span class="s">@&quot;姓名</span><span class="se">\t</span><span class="s">性别</span><span class="se">\t</span><span class="s">体重</span><span class="se">\t</span><span class="s">创建时间</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">];</span>
+<span class="n">NSString</span> <span class="o">*</span><span class="n">timestamp</span> <span class="o">=</span> <span class="p">[</span><span class="n">dateFormatter</span> <span class="nl">stringFromDate:</span><span class="p">[</span><span class="n">NSDate</span> <span class="n">date</span><span class="p">]];</span>
+<span class="p">[</span><span class="n">csvString</span> <span class="nl">appendString:</span><span class="p">[</span><span class="n">NSString</span> <span class="nl">stringWithFormat:</span><span class="s">@&quot;</span><span class="se">\xEF\xBB\xBF</span><span class="s">%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">@&quot;黄拓&quot;</span><span class="p">,</span> <span class="s">@&quot;男&quot;</span><span class="p">,</span> <span class="s">@&quot;65 kg&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">]];</span>
+<span class="p">[</span><span class="n">csvString</span> <span class="nl">appendString:</span><span class="p">[</span><span class="n">NSString</span> <span class="nl">stringWithFormat:</span><span class="s">@&quot;</span><span class="se">\xEF\xBB\xBF</span><span class="s">%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\t</span><span class="s">%@</span><span class="se">\r\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">@&quot;詹姆斯&quot;</span><span class="p">,</span> <span class="s">@&quot;女&quot;</span><span class="p">,</span> <span class="s">@&quot;25 kg&quot;</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">]];</span>
+ <span class="n">NSString</span> <span class="o">*</span><span class="n">sourceString</span> <span class="o">=</span> <span class="p">[[</span><span class="n">NSString</span> <span class="n">alloc</span><span class="p">]</span> <span class="nl">initWithFormat:</span><span class="s">@&quot;</span><span class="se">\xEF\xBB\xBF</span><span class="s">%@&quot;</span><span class="p">,</span> <span class="n">csvString</span><span class="p">];</span>
+<span class="n">NSData</span> <span class="o">*</span><span class="n">encodedData</span> <span class="o">=</span> <span class="p">[</span><span class="n">sourceString</span> <span class="nl">dataUsingEncoding:</span><span class="n">NSUTF16StringEncoding</span> <span class="nl">allowLossyConversion:</span><span class="n">YES</span><span class="p">];</span>
+<span class="p">[</span><span class="n">picker</span> <span class="nl">addAttachmentData:</span><span class="n">encodedData</span> <span class="nl">mimeType:</span><span class="s">@&quot;text/csv&quot;</span> <span class="nl">fileName:</span><span class="s">@&quot;statistics.csv&quot;</span><span class="p">];</span>
+</code></pre></div>
+    
 
-<p><br/>
+<p>你可以很奇怪，我们应该只需要在头部添加BOM标记就好啦， 为什么每一行内容都需要添加这个标记？<br>
+具体原因我无法解释，但是如果不加了，那么显示一行可能没问题，但是如果一旦显示超过四五行的内容，就会出现奇怪的乱码。<br><br>
+<img src="/static/images/20130118/2.png" alt="乱码">  </p>
+
+<p><br/><br>
 Okay 搞定!</p>
 
   </div>
