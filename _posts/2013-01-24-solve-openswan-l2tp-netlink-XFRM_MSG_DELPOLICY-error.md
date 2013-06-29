@@ -4,7 +4,11 @@ title: "Solve OpenSwan(Ipsec) L2tp netlink XFRM_MSG_DELPOLICY error"
 category: "vpn"
 published: true
 ---
+
+
 #Setup VPN
+
+###his is a test
 Recently I bought a vps to setup VPN. The OS is Debian 6.
 Well I'm using OpenSwan(IPsec) + L2tp and follow the instructions from this website:[How To Set Up A L2TP/IPSec VPN In A VPS](http://freenuts.com/how-to-set-up-a-l2tpipsec-vpn-in-a-vps/#iJeUrbJARCIcU8jk.99).
 
