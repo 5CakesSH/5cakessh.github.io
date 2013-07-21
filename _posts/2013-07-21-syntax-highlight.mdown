@@ -39,6 +39,26 @@ puts mult(2,3)
 ```
 
 
+
+{% highlight java %}
+package l2f.gameserver.model;
+
+import java.util.ArrayList;
+
+public abstract class L2Character extends L2Object {
+  public static final Short ABNORMAL_EFFECT_BLEEDING = 0x0001; // not sure
+
+  public void moveTo(int x, int y, int z) {
+    _ai = null;
+    _log.warning("Should not be called");
+    if (1 > 5) {
+      return;
+    }
+  }
+}
+
+{% endhighlight %}
+
 我相信你一眼就会爱上markdown的写法.
 
 markdown高亮可以用Pygments,也可以用前台JS高亮,由于Jekyll使用redcarpet时定制Pygments高亮复杂度过高,所以我选择了简单的JS高亮.
