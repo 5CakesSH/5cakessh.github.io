@@ -1,0 +1,44 @@
+---
+
+title: Code Syntax Highlight
+layout: default
+---
+
+
+http://blog.mangege.com/categories/tech/
+
+Jekyll官方文档指导用户使用Liquid,再配合Pygments实现高亮,但作为markdown的忠实粉丝,怎么能用如此繁锁的语法.
+
+##Liquid代码块写法:
+
+
+{% highlight ruby %}
+def foo
+  puts 'foo'
+end
+
+def mult(a,b)
+  product = a * b
+end
+puts mult(2,3)
+
+{% endhighlight %}
+
+##markdown GFM fenced code 代码块写法:
+
+```ruby
+def foo
+  puts 'foo'
+end
+
+def mult(a,b)
+  product = a * b
+end
+puts mult(2,3)
+
+```
+
+
+我相信你一眼就会爱上markdown的写法.
+
+markdown高亮可以用Pygments,也可以用前台JS高亮,由于Jekyll使用redcarpet时定制Pygments高亮复杂度过高,所以我选择了简单的JS高亮.
